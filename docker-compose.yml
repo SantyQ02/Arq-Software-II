@@ -1,0 +1,131 @@
+version: '3.8'
+services:
+  hotels:
+    container_name: hotels_service
+    restart: always
+    build:
+      context: ./hotels
+    ports:
+      - 8090:8080
+    depends_on:
+      - mongodb
+      - solr
+      - queue
+    volumes:
+      - hotels_go_modules:/go/pkg/mod
+      - public:/api/static
+    networks:
+      - app-network
+
+  search:
+    container_name: search_service
+    restart: always
+    build:
+      context: ./search
+    ports:
+      - 8091:8080
+    depends_on:
+      - queue
+    volumes:
+      - search_go_modules:/go/pkg/mod
+    networks:
+      - app-network
+
+  business:
+    container_name: business_service
+    restart: always
+    build:
+      context: ./business
+    ports:
+      - 8092:8080
+    depends_on:
+      - db_business
+      - memcached
+    volumes:
+      - business_go_modules:/go/pkg/mod
+    networks:
+      - app-network
+
+  frontend:
+    container_name: hotels_frontend
+    build:
+      context: ./frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - frontend_node_modules:/app/node_modules
+    networks:
+      - app-network
+
+  db_business:
+    image: mysql
+    container_name: db_business
+    restart: always
+    environment:
+      MYSQL_DATABASE: db_business
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3307:3306
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27018:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes:
+      - mongodata:/data/db
+    networks:
+      - app-network
+
+  memcached:
+    image: memcached:1.6.16
+    container_name: memcached
+    restart: always
+    ports: 
+      - 11211:11211
+    networks:
+      - app-network 
+    
+  queue:
+    image: rabbitmq:3-management
+    container_name: queue
+    restart: always
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    networks:
+      - app-network
+
+  solr:
+    image: solr
+    container_name: solr
+    restart: always
+    ports: 
+      - 8983:8983
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+  mongodata:
+  hotels_go_modules:
+  search_go_modules:
+  business_go_modules:
+  frontend_node_modules:
+  public:
