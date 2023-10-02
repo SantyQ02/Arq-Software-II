@@ -1,4 +1,4 @@
-# Hotel Reservation Project with microservices
+# Hotel Reservation Project with Microservices
 
 This is a hotel reservation project that allows users to search and book rooms in different hotels. It also includes an administration panel for administrators to manage hotels, bookings, and users.
 
