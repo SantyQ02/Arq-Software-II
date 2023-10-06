@@ -6,6 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
+	"mvc-go/dto"
 )
 
 func CheckAvailability(c *gin.Context) {
@@ -14,8 +16,11 @@ func CheckAvailability(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "hotelID must be a uuid"})
 		return
 	}
+	
+	checkInDate	:= c.Query("checkInDate")
+	checkOutDate := c.Query("checkOutDate")
 
-	availability, er := businessService.BusinessService.CheckAvailability(uuid)
+	availability, er := businessService.BusinessService.CheckAvailability(uuid, checkInDate, checkOutDate)
 	if er != nil {
 		c.JSON(er.Status(), gin.H{"error": er.Message()})
 		return
