@@ -31,13 +31,6 @@ func init() {
 	DBPort := os.Getenv("MYSQL_DB_PORT")
 	// ------------------------
 
-	log.Info("ACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
-	log.Info(DBName)
-	log.Info(DBUser)
-	log.Info(DBPass)
-	log.Info(DBHost)
-	log.Info(DBPort)
-
 	db, err = gorm.Open("mysql", DBUser+":"+DBPass+"@tcp("+DBHost+":"+DBPort+")/"+DBName+"?charset=utf8&parseTime=True")
 
 	if err != nil {

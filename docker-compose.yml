@@ -43,6 +43,12 @@ services:
       - memcached
     volumes:
       - business_go_modules:/go/pkg/mod
+    environment:
+      - MYSQL_DB_NAME=db_business
+      - MYSQL_DB_USER=root
+      - MYSQL_DB_PASS=root
+      - MYSQL_DB_HOST=db_business
+      - MYSQL_DB_PORT=3306
     networks:
       - app-network
 
