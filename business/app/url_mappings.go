@@ -23,9 +23,6 @@ func mapUrls() {
 	user := api.Group("/user")
 	urls.UserRoute(user)
 
-	hotel := api.Group("/hotel")
-	urls.HotelRoute(hotel)
-
 	booking := api.Group("/booking", middlewareController.DeserializeUser())
 	urls.BookingRoute(booking)
 

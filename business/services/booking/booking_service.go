@@ -35,6 +35,7 @@ func init() {
 
 func (s *bookingService) CreateBooking(bookingDto dto.Booking) (dto.Booking, e.ApiError) {
 	booking := model.Booking{
+		Rooms:   bookingDto.Rooms,
 		Total:   bookingDto.Total,
 		DateIn:  bookingDto.DateIn,
 		DateOut: bookingDto.DateOut,
@@ -61,6 +62,11 @@ func (s *bookingService) CreateBooking(bookingDto dto.Booking) (dto.Booking, e.A
 		return dto.Booking{}, e.NewBadRequestApiError("You should not have a DateIn greater or equal than the DateOut")
 	}
 
+	availableRooms := hotelClient.HotelClient.GetAvailableRooms(bookingData)
+	if booking.Rooms > uint(availableRooms) {
+		return dto.Booking{}, e.NewBadRequestApiError("You cannot book more rooms than the ones currently available")
+	}
+
 	booking = bookingClient.BookingClient.InsertBooking(booking)
 	if booking.BookingID == uuid.Nil {
 		return dto.Booking{}, e.NewInternalServerApiError("Error trying to create new booking", errors.New(""))
@@ -81,6 +87,7 @@ func (s *bookingService) GetBookingById(booking_id uuid.UUID) (dto.Booking, e.Ap
 	bookingDto := dto.Booking{
 		BookingID: booking.BookingID,
 		Total:     booking.Total,
+		Rooms:     booking.Rooms,
 		UserID:    booking.UserID,
 		HotelID:   booking.HotelID,
 		DateIn:    booking.DateIn,
@@ -103,6 +110,7 @@ func (s *bookingService) GetBookings() (dto.Bookings, e.ApiError) {
 		var bookingDto dto.Booking
 		bookingDto.BookingID = booking.BookingID
 		bookingDto.UserID = booking.UserID
+		bookingDto.Rooms = booking.Rooms
 		bookingDto.Total = booking.Total
 		bookingDto.DateIn = booking.DateIn
 		bookingDto.DateOut = booking.DateOut
@@ -129,6 +137,7 @@ func (s *bookingService) GetBookingsByUserId(id uuid.UUID) (dto.Bookings, e.ApiE
 		var bookingDto dto.Booking
 		bookingDto.BookingID = booking.BookingID
 		bookingDto.UserID = booking.UserID
+		bookingDto.Rooms = booking.Rooms
 		bookingDto.Total = booking.Total
 		bookingDto.DateIn = booking.DateIn
 		bookingDto.DateOut = booking.DateOut
@@ -159,6 +168,7 @@ func (s *bookingService) SearchBookings(hotel string, user string, dateIn time.T
 		var bookingDto dto.Booking
 		bookingDto.BookingID = booking.BookingID
 		bookingDto.UserID = booking.UserID
+		bookingDto.Rooms = booking.Rooms
 		bookingDto.Total = booking.Total
 		bookingDto.DateIn = booking.DateIn
 		bookingDto.DateOut = booking.DateOut
@@ -193,6 +203,7 @@ func (s *bookingService) SetActiveBooking(bookingDto dto.Booking) (dto.Booking, 
 		BookingID: bookingDto.BookingID,
 		HotelID:   bookingDto.HotelID,
 		UserID:    bookingDto.UserID,
+		Rooms:     bookingDto.Rooms,
 		Total:     bookingDto.Total,
 		DateIn:    bookingDto.DateIn,
 		DateOut:   bookingDto.DateOut,

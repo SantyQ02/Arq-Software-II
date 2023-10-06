@@ -3,11 +3,13 @@ package businessController
 import (
 	businessService "mvc-go/services/business"
 	"net/http"
+	"time"
+
+	"mvc-go/dto"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	"mvc-go/dto"
 )
 
 func CheckAvailability(c *gin.Context) {
@@ -16,9 +18,17 @@ func CheckAvailability(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "hotelID must be a uuid"})
 		return
 	}
-	
-	checkInDate	:= c.Query("checkInDate")
-	checkOutDate := c.Query("checkOutDate")
+
+	checkInDate, erIn := time.Parse("2006-01-02", c.Query("checkInDate"))
+	if erIn != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "checkInDate must be a valid value"})
+		return
+	}
+	checkOutDate, erOut := time.Parse("2006-01-02", c.Query("checkOutDate"))
+	if erOut != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "checkOutDate must be a valid value"})
+		return
+	}
 
 	availability, er := businessService.BusinessService.CheckAvailability(uuid, checkInDate, checkOutDate)
 	if er != nil {
