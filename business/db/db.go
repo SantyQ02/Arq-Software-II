@@ -6,6 +6,7 @@ import (
 	hotelClient "mvc-go/clients/hotel"
 	photoClient "mvc-go/clients/photo"
 	userClient "mvc-go/clients/user"
+	businessClient "mvc-go/clients/business"
 	"os"
 
 	"mvc-go/model"
@@ -22,7 +23,7 @@ var (
 
 func init() {
 
-	// DB Connections Paramters
+	// DB Connections Parameters
 	DBName := os.Getenv("MYSQL_DB_NAME")
 	DBUser := os.Getenv("MYSQL_DB_USER")
 	DBPass := os.Getenv("MYSQL_DB_PASS")
@@ -39,12 +40,13 @@ func init() {
 		log.Info("Connection Established")
 	}
 
-	// We need to add all CLients that we build
+	// We need to add all CLients that we built
 	userClient.Db = db
 	hotelClient.Db = db
 	photoClient.Db = db
 	amenitieClient.Db = db
 	bookingClient.Db = db
+	businessClient.Db = db
 
 }
 
@@ -55,6 +57,7 @@ func StartDbEngine() {
 	db.AutoMigrate((&model.Booking{}))
 	db.AutoMigrate((&model.Photo{}))
 	db.AutoMigrate((&model.Amenitie{}))
+	db.AutoMigrate((&model.HotelMapping{}))
 
 	log.Info("Finishing Migration Database Tables")
 }
