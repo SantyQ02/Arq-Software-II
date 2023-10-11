@@ -74,7 +74,7 @@ func (s *businessClient) GetAmadeusAvailability(amadeusID string, checkInDate ti
 
 	if resp.StatusCode != http.StatusOK {
 		fmt.Println("Error en la solicitud:", resp.StatusCode)
-		return false, e.NewInternalServerApiError("Error getting response from Amadeus availability!", errors.New(""))
+		return false, e.NewInternalServerApiError("Error getting response from Amadeus availability! (Status-Code)", errors.New(""))
 	}
 
 	var availabilityResponse availabilityResponse
@@ -84,8 +84,12 @@ func (s *businessClient) GetAmadeusAvailability(amadeusID string, checkInDate ti
 		fmt.Println("Error al decodificar la respuesta JSON:", err)
 		return false, nil
 	}
+	
+	if len(availabilityResponse.Data) == 0 {
+		return false, nil
+	}
 
-	return availabilityResponse.Available, nil
+	return availabilityResponse.Data[0].Available, nil
 }
 
 func getAmadeusToken() {
@@ -118,7 +122,7 @@ func getAmadeusToken() {
 		}
 
 		// Decodificar la respuesta JSON en la estructura AccessTokenResponse
-		var tokenResponse AccessTokenResponse
+		var tokenResponse accessTokenResponse
 		err = json.NewDecoder(response.Body).Decode(&tokenResponse)
 		if err != nil {
 			fmt.Println("Error al decodificar la respuesta JSON:", err)
@@ -134,7 +138,7 @@ func getAmadeusToken() {
 	}
 }
 
-type AccessTokenResponse struct {
+type accessTokenResponse struct {
 	Type            string `json:"type"`
 	Username        string `json:"username"`
 	ApplicationName string `json:"application_name"`
@@ -147,5 +151,7 @@ type AccessTokenResponse struct {
 }
 
 type availabilityResponse struct {
-	Available bool `json:"available"`
+	Data []struct {
+		Available bool `json:"available" binding:"required"`
+	}
 }
