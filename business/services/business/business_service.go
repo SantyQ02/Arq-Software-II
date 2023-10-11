@@ -12,7 +12,6 @@ import (
 	e "mvc-go/utils/errors"
 
 	"github.com/google/uuid"
-	log "github.com/sirupsen/logrus"
 	// "os"
 )
 
