@@ -61,11 +61,6 @@ func (s *businessService) CheckAvailability(id uuid.UUID, checkInDate time.Time,
 }
 
 func (s *businessService) MapHotel(hotelMappingDto dto.HotelMapping) (dto.HotelMapping, e.ApiError) {
-	_, err := hotelService.HotelService.GetHotelById(hotelMappingDto.HotelID)
-	if err != nil {
-		return dto.HotelMapping{}, err
-	}
-
 	hotelMapping := model.HotelMapping{
 		HotelID:   hotelMappingDto.HotelID,
 		AmadeusID: hotelMappingDto.AmadeusID,
