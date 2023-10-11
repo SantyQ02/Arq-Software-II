@@ -1,12 +1,13 @@
 package businessClient
 
 import (
-	"os"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"mvc-go/model"
 	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	e "mvc-go/utils/errors"
@@ -30,6 +31,7 @@ var (
 
 func init() {
 	BusinessClient = &businessClient{}
+	go getAmadeusToken()
 }
 
 var AmadeusToken string
@@ -77,35 +79,57 @@ func (s *businessClient) GetAmadeusAvailability(amadeusID string, checkInDate ti
 }
 
 func getAmadeusToken() {
-	clientID := os.Getenv("AMADEUS_API_KEY")
-	clientSecret := os.Getenv("AMADEUS_API_SECRET")
+	for {
+		clientID := os.Getenv("AMADEUS_API_KEY")
+		clientSecret := os.Getenv("AMADEUS_API_SECRET")
 
-	token_url := fmt.Sprintf("https://test.api.amadeus.com/v1/security/oauth2/token?grant_type=client_credentials&client_id=%s&client_secret=%s", clientID, clientSecret)
+		tokenURL := "https://test.api.amadeus.com/v1/security/oauth2/token"
+		data := fmt.Sprintf("grant_type=client_credentials&client_id=%s&client_secret=%s", clientID, clientSecret)
 
-	response, err := http.Get(token_url)
-	if err != nil {
-		fmt.Println("Error en la solicitud:", err)
-		return	
+		req, err := http.NewRequest("POST", tokenURL, strings.NewReader(data))
+		if err != nil {
+			fmt.Println("Error creating request:", err)
+			return
+		}
+
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+		client := http.Client{}
+		response, err := client.Do(req)
+		if err != nil {
+			fmt.Println("Error en la solicitud:", err)
+			return
+		}
+		defer response.Body.Close()
+
+		if response.StatusCode != http.StatusOK {
+			fmt.Println("Error en la solicitud:", response.StatusCode)
+			return
+		}
+
+		// Decodificar la respuesta JSON en la estructura AccessTokenResponse
+		var tokenResponse AccessTokenResponse
+		err = json.NewDecoder(response.Body).Decode(&tokenResponse)
+		if err != nil {
+			fmt.Println("Error al decodificar la respuesta JSON:", err)
+			return
+		}
+
+		AmadeusToken = tokenResponse.AccessToken
+
+		sleepTime := 1700 * time.Second
+		time.Sleep(sleepTime)
 	}
-	defer response.Body.Close()
-
-	if response.StatusCode != http.StatusOK {
-		fmt.Println("Error en la solicitud:", response.StatusCode)
-		return
-	}
-
-	// Decodificar la respuesta JSON en la estructura AccessTokenResponse
-	var tokenResponse AccessTokenResponse
-	err = json.NewDecoder(response.Body).Decode(&tokenResponse)
-	if err != nil {
-		fmt.Println("Error al decodificar la respuesta JSON:", err)
-		return
-	}
-
-	accessToken := tokenResponse.AccessToken
 }
 
 type AccessTokenResponse struct {
-	
+	Type            string `json:"type"`
+	Username        string `json:"username"`
+	ApplicationName string `json:"application_name"`
+	ClientID        string `json:"client_id"`
+	TokenType       string `json:"token_type"`
+	AccessToken     string `json:"access_token"`
+	ExpiresIn       int    `json:"expires_in"`
+	State           string `json:"state"`
+	Scope           string `json:"scope"`
 }
-
