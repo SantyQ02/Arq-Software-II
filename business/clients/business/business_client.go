@@ -84,7 +84,7 @@ func (s *businessClient) GetAmadeusAvailability(amadeusID string, checkInDate ti
 		fmt.Println("Error al decodificar la respuesta JSON:", err)
 		return false, nil
 	}
-	
+
 	if len(availabilityResponse.Data) == 0 {
 		return false, nil
 	}

@@ -2,7 +2,7 @@ package businessService
 
 import (
 	"fmt"
-	// "mvc-go/cache"
+	"mvc-go/cache"
 	businessClient "mvc-go/clients/business"
 	userClient "mvc-go/clients/user"
 	"mvc-go/dto"
@@ -14,7 +14,6 @@ import (
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 	// "os"
-	// "github.com/joho/godotenv"
 )
 
 type businessService struct{}
@@ -37,12 +36,10 @@ func init() {
 func (s *businessService) CheckAvailability(id uuid.UUID, checkInDate time.Time, checkOutDate time.Time) (bool, e.ApiError) {
 	cacheKey := fmt.Sprintf("%s/%s/%s", id.String(), checkInDate.Format("2006-01-02"), checkOutDate.Format("2006-01-02"))
 
-	log.Info(cacheKey) // Debug
-
-	// availability := cache.Get(cacheKey)
-	// if availability != nil {
-	// 	return bytesToBool(availability), nil
-	// }
+	availability := cache.Get(cacheKey)
+	if availability != nil {
+		return bytesToBool(availability), nil
+	}
 
 	amadeusID, er := BusinessService.HotelIDToAmadeusID(id)
 	if er != nil {
@@ -54,7 +51,7 @@ func (s *businessService) CheckAvailability(id uuid.UUID, checkInDate time.Time,
 		return false, err
 	}
 
-	// cache.SetWithExpiration(cacheKey, boolToBytes(available), 10) // Cache Expiration 10 seconds
+	cache.SetWithExpiration(cacheKey, boolToBytes(available), 10) // Cache Expiration 10 seconds
 
 	return available, nil
 }

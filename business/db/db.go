@@ -3,10 +3,10 @@ package db
 import (
 	amenitieClient "mvc-go/clients/amenitie"
 	bookingClient "mvc-go/clients/booking"
+	businessClient "mvc-go/clients/business"
 	hotelClient "mvc-go/clients/hotel"
 	photoClient "mvc-go/clients/photo"
 	userClient "mvc-go/clients/user"
-	businessClient "mvc-go/clients/business"
 	"os"
 
 	"mvc-go/model"
