@@ -20,7 +20,7 @@ import (
 type businessClient struct{}
 
 type businessClientInterface interface {
-	InsertHotelMapping(hotelMapping model.HotelMapping)
+	InsertHotelMapping(hotelMapping model.HotelMapping) error
 	GetAmadeusIDByHotelID(hotelID uuid.UUID) string
 	GetAmadeusAvailability(amadeusID string, checkInDate time.Time, checkOutDate time.Time) (bool, e.ApiError)
 }
@@ -37,11 +37,12 @@ func init() {
 var AmadeusToken string
 var Db *gorm.DB
 
-func (s *businessClient) InsertHotelMapping(hotelMapping model.HotelMapping) {
+func (s *businessClient) InsertHotelMapping(hotelMapping model.HotelMapping) error {
 	result := Db.Create(&hotelMapping)
 	if result.Error != nil {
-		log.Error("")
+		return result.Error
 	}
+	return nil
 }
 
 func (s *businessClient) GetAmadeusIDByHotelID(hotelID uuid.UUID) string {
@@ -57,21 +58,29 @@ type availabilityResponse struct {
 
 func (s *businessClient) GetAmadeusAvailability(amadeusID string, checkInDate time.Time, checkOutDate time.Time) (bool, e.ApiError) {
 	url := fmt.Sprintf("https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=%s&checkInDate=%s&checkOutDate=%s", amadeusID, checkInDate.Format("2006-01-02"), checkOutDate.Format("2006-01-02"))
+	tokenHeader := fmt.Sprintf("Bearer %s", AmadeusToken)
 
-	// AmadeusToken use
-
-	resp, err := http.Get(url)
+	req, err := http.NewRequest("GET", url, strings.NewReader(""))
 	if err != nil {
-		fmt.Println("Error al hacer la solicitud:", err)
-		return false, e.NewInternalServerApiError("Amadeus se cae a los pedazos y no devuelve nada", errors.New(""))
+		fmt.Println("Error creating request:", err)
+		return false, e.NewInternalServerApiError("Error creating request to get Amadeus availability!", errors.New(""))
 	}
 
+	req.Header.Set("Authorization", tokenHeader)
+
+	client := http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error en la solicitud:", err)
+		return false, e.NewInternalServerApiError("Error getting response from Amadeus availability!", errors.New(""))
+	}
 	defer resp.Body.Close()
 
 	var availabilityResponse availabilityResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&availabilityResponse)
 	if err != nil {
+		log.Info("HOLA")
 		return false, nil
 	}
 
@@ -116,6 +125,8 @@ func getAmadeusToken() {
 		}
 
 		AmadeusToken = tokenResponse.AccessToken
+
+		log.Info(AmadeusToken)
 
 		sleepTime := 1700 * time.Second
 		time.Sleep(sleepTime)

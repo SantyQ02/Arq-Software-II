@@ -2,12 +2,11 @@ package businessService
 
 import (
 	"fmt"
-	"mvc-go/cache"
+	// "mvc-go/cache"
 	businessClient "mvc-go/clients/business"
 	userClient "mvc-go/clients/user"
 	"mvc-go/dto"
 	"mvc-go/model"
-	hotelService "mvc-go/services/hotel"
 	"time"
 
 	e "mvc-go/utils/errors"
@@ -40,10 +39,10 @@ func (s *businessService) CheckAvailability(id uuid.UUID, checkInDate time.Time,
 
 	log.Info(cacheKey) // Debug
 
-	availability := cache.Get(cacheKey)
-	if availability != nil {
-		return bytesToBool(availability), nil
-	}
+	// availability := cache.Get(cacheKey)
+	// if availability != nil {
+	// 	return bytesToBool(availability), nil
+	// }
 
 	amadeusID, er := BusinessService.HotelIDToAmadeusID(id)
 	if er != nil {
@@ -55,7 +54,7 @@ func (s *businessService) CheckAvailability(id uuid.UUID, checkInDate time.Time,
 		return false, err
 	}
 
-	cache.SetWithExpiration(cacheKey, boolToBytes(available), 10) // Cache Expiration 10 seconds
+	// cache.SetWithExpiration(cacheKey, boolToBytes(available), 10) // Cache Expiration 10 seconds
 
 	return available, nil
 }
@@ -66,7 +65,10 @@ func (s *businessService) MapHotel(hotelMappingDto dto.HotelMapping) (dto.HotelM
 		AmadeusID: hotelMappingDto.AmadeusID,
 	}
 
-	businessClient.BusinessClient.InsertHotelMapping(hotelMapping)
+	err := businessClient.BusinessClient.InsertHotelMapping(hotelMapping)
+	if err != nil {
+		return dto.HotelMapping{}, e.NewBadRequestApiError("AmadeusID already mapped to an existing HotelID or HotelID already mapped to an AmadeusID.")
+	}
 
 	return hotelMappingDto, nil
 }
