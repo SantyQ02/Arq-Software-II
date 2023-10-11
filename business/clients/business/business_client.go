@@ -52,10 +52,6 @@ func (s *businessClient) GetAmadeusIDByHotelID(hotelID uuid.UUID) string {
 	return hotelMapping.AmadeusID
 }
 
-type availabilityResponse struct {
-	Available bool `json:"available" binding:"required"`
-}
-
 func (s *businessClient) GetAmadeusAvailability(amadeusID string, checkInDate time.Time, checkOutDate time.Time) (bool, e.ApiError) {
 	url := fmt.Sprintf("https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=%s&checkInDate=%s&checkOutDate=%s", amadeusID, checkInDate.Format("2006-01-02"), checkOutDate.Format("2006-01-02"))
 	tokenHeader := fmt.Sprintf("Bearer %s", AmadeusToken)
@@ -76,11 +72,16 @@ func (s *businessClient) GetAmadeusAvailability(amadeusID string, checkInDate ti
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		fmt.Println("Error en la solicitud:", resp.StatusCode)
+		return false, e.NewInternalServerApiError("Error getting response from Amadeus availability!", errors.New(""))
+	}
+
 	var availabilityResponse availabilityResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&availabilityResponse)
 	if err != nil {
-		log.Info("HOLA")
+		fmt.Println("Error al decodificar la respuesta JSON:", err)
 		return false, nil
 	}
 
@@ -143,4 +144,8 @@ type AccessTokenResponse struct {
 	ExpiresIn       int    `json:"expires_in"`
 	State           string `json:"state"`
 	Scope           string `json:"scope"`
+}
+
+type availabilityResponse struct {
+	Available bool `json:"available"`
 }
