@@ -1,6 +1,7 @@
 package businessClient
 
 import (
+	"os"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -31,6 +32,7 @@ func init() {
 	BusinessClient = &businessClient{}
 }
 
+var AmadeusToken string
 var Db *gorm.DB
 
 func (s *businessClient) InsertHotelMapping(hotelMapping model.HotelMapping) {
@@ -54,6 +56,8 @@ type availabilityResponse struct {
 func (s *businessClient) GetAmadeusAvailability(amadeusID string, checkInDate time.Time, checkOutDate time.Time) (bool, e.ApiError) {
 	url := fmt.Sprintf("https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=%s&checkInDate=%s&checkOutDate=%s", amadeusID, checkInDate.Format("2006-01-02"), checkOutDate.Format("2006-01-02"))
 
+	// AmadeusToken use
+
 	resp, err := http.Get(url)
 	if err != nil {
 		fmt.Println("Error al hacer la solicitud:", err)
@@ -71,3 +75,37 @@ func (s *businessClient) GetAmadeusAvailability(amadeusID string, checkInDate ti
 
 	return availabilityResponse.Available, nil
 }
+
+func getAmadeusToken() {
+	clientID := os.Getenv("AMADEUS_API_KEY")
+	clientSecret := os.Getenv("AMADEUS_API_SECRET")
+
+	token_url := fmt.Sprintf("https://test.api.amadeus.com/v1/security/oauth2/token?grant_type=client_credentials&client_id=%s&client_secret=%s", clientID, clientSecret)
+
+	response, err := http.Get(token_url)
+	if err != nil {
+		fmt.Println("Error en la solicitud:", err)
+		return	
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		fmt.Println("Error en la solicitud:", response.StatusCode)
+		return
+	}
+
+	// Decodificar la respuesta JSON en la estructura AccessTokenResponse
+	var tokenResponse AccessTokenResponse
+	err = json.NewDecoder(response.Body).Decode(&tokenResponse)
+	if err != nil {
+		fmt.Println("Error al decodificar la respuesta JSON:", err)
+		return
+	}
+
+	accessToken := tokenResponse.AccessToken
+}
+
+type AccessTokenResponse struct {
+	
+}
+

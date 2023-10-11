@@ -49,6 +49,8 @@ services:
       - MYSQL_DB_PASS=root
       - MYSQL_DB_HOST=db_business
       - MYSQL_DB_PORT=3306
+      - AMADEUS_API_KEY=GTGaWwpNKsUwpQG4v4Q9PVZr3n69PCio
+      - AMADEUS_API_SECRET=8ynGLNxs9Gl63GYQ
       - QUERY_KEY=Edsf489545
     networks:
       - app-network
