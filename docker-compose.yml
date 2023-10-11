@@ -49,6 +49,7 @@ services:
       - MYSQL_DB_PASS=root
       - MYSQL_DB_HOST=db_business
       - MYSQL_DB_PORT=3306
+      - QUERY_KEY=Edsf489545
     networks:
       - app-network
 

@@ -101,7 +101,7 @@ func (m *middlewareService) CheckAdmin() gin.HandlerFunc {
 
 		user := userClient.UserClient.GetUserById(fmt.Sprint(sub))
 		if user.UserID == uuid.Nil {
-			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "the user belonging to this token no logger exists"})
+			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "The user belonging to this token no longer exists"})
 			return
 		}
 
@@ -110,7 +110,7 @@ func (m *middlewareService) CheckAdmin() gin.HandlerFunc {
 			return
 		}
 		if !user.Active {
-			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Your account has been desactivated"})
+			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Your account has been deactivated"})
 			return
 		}
 

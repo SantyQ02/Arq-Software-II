@@ -9,4 +9,5 @@ import (
 func BusinessRoute(business *gin.RouterGroup) {
 	business.GET("/availability/:hotelID", businessController.CheckAvailability)
 	business.POST("/mapping-hotel", businessController.MapHotel)
+	business.GET("/check-admin/:userID", businessController.CheckAdmin)
 }

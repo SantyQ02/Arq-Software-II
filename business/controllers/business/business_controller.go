@@ -1,11 +1,11 @@
 package businessController
 
 import (
+	"mvc-go/dto"
 	businessService "mvc-go/services/business"
 	"net/http"
+	"os"
 	"time"
-
-	"mvc-go/dto"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -55,4 +55,27 @@ func MapHotel(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"hotel_mapping": hotel_mapping})
+}
+
+func CheckAdmin(c *gin.Context) {
+	uuid, err := uuid.Parse(c.Param("userID"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "userID must be a uuid"})
+		return
+	}
+
+	queryKey := c.Query("key")
+	key := os.Getenv("QUERY_KEY")
+	if queryKey != key {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Invalid key"})
+		return
+	}
+
+	adminbool, er := businessService.BusinessService.CheckAdmin(uuid)
+	if er != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"user_id": uuid, "admin": adminbool})
 }
