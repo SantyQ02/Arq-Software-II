@@ -34,16 +34,14 @@ func (s *hotelService) InsertHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 
 	var Photos model.Photos
 
-	for _, photo := range hotelDto.Photos {
-			var modelPhoto model.Photo
+	// for _, photo := range hotelDto.Photos {
+	// 		var modelPhoto model.Photo
 
-			modelPhoto.PhotoID = uuid.New().String()
-			modelPhoto.Url = photo.Url
+	// 		modelPhoto.PhotoID = uuid.New().String()
+	// 		modelPhoto.Url = photo.Url
 
-			photo.PhotoID,_ = uuid.Parse(modelPhoto.PhotoID) 
-
-			Photos = append(Photos, modelPhoto)
-		}
+	// 		Photos = append(Photos, modelPhoto)
+	// 	}
 	
 	var Amenities model.Amenities
 
@@ -52,8 +50,6 @@ func (s *hotelService) InsertHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 
 			modelAmenity.AmenityID = uuid.New().String()
 			modelAmenity.Title = amenity.Title
-
-			amenity.AmenityID,_ = uuid.Parse(modelAmenity.AmenityID) 
 
 			Amenities = append(Amenities, modelAmenity)
 		}
@@ -77,6 +73,28 @@ func (s *hotelService) InsertHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 
 	hotelDto.HotelID,_ = uuid.Parse(hotel.HotelID)
 
+	// var newPhotos dto.Photos
+	var newAmenities dto.Amenities
+
+	// hotelDto.Photos = newPhotos
+	hotelDto.Amenities = newAmenities
+
+	// for _, photo := range hotel.Photos {
+	// 	var dtoPhoto dto.Photo
+
+	// 	dtoPhoto.PhotoID,_ = uuid.Parse(photo.PhotoID)
+	// 	dtoPhoto.Url = photo.Url
+	// 	hotelDto.Photos = append(hotelDto.Photos, dtoPhoto)
+	// }
+	for _, amenity := range hotel.Amenities {
+		var dtoAmenity dto.Amenity
+
+		dtoAmenity.AmenityID,_ = uuid.Parse(amenity.AmenityID)
+		dtoAmenity.Title = amenity.Title
+
+		hotelDto.Amenities = append(hotelDto.Amenities, dtoAmenity)
+	}
+
 
 	return hotelDto, nil
 }
@@ -88,6 +106,7 @@ func (s *hotelService) UpdateHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 	for _, photo := range hotelDto.Photos {
 			var modelPhoto model.Photo
 
+			modelPhoto.PhotoID = photo.PhotoID.String()
 			modelPhoto.Url = photo.Url
 
 			Photos = append(Photos, modelPhoto)
@@ -98,6 +117,7 @@ func (s *hotelService) UpdateHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 	for _, amenity := range hotelDto.Amenities {
 			var modelAmenity model.Amenity
 
+			modelAmenity.AmenityID = amenity.AmenityID.String()
 			modelAmenity.Title = amenity.Title
 
 			Amenities = append(Amenities, modelAmenity)
@@ -143,7 +163,7 @@ func (s *hotelService) GetHotelById(id uuid.UUID) (dto.Hotel, e.ApiError) {
 
 	hotel := hotelClient.HotelClient.GetHotelById(idString)
 	if hotel.HotelID == "" {
-		return dto.Hotel{}, e.NewInternalServerApiError("Hotel not found", errors.New(""))
+		return dto.Hotel{}, e.NewNotFoundApiError("Hotel not found")
 	}
 
 	idhotel,_ := uuid.Parse(hotel.HotelID)

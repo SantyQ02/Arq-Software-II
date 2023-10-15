@@ -5,13 +5,54 @@ import (
 	// userService "mvc-go/services/user"
 	"net/http"
 	"path/filepath"
+	"encoding/json"
 
 	"mvc-go/dto"
 	hotelService "mvc-go/services/hotel"
 	"github.com/google/uuid"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
+	"mvc-go/queue"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
+
+type Message struct{
+    HotelID uuid.UUID  `json:"hotel_id"`
+    Action  string `json:"action"`
+}
+
+func SendMessage(id uuid.UUID, action string){
+
+	q := queue.Queue
+	ch := queue.Channel
+
+	message := Message{
+        HotelID: id,
+        Action:  action,
+    }
+
+	messageJSON, err := json.Marshal(message)
+
+    if err != nil {
+        log.Fatalf("Failed to marshal json: %v", err)
+        return
+    }
+
+	err = ch.Publish(
+		"",     // Intercambio (exchange) predeterminado
+		q.Name, // Nombre de la cola
+		false,  // No mandar confirmación
+		false,  // No es mandatorio
+		amqp.Publishing{
+            ContentType: "application/json", // Establece el tipo de contenido a JSON
+            Body:        messageJSON,         // Establece el cuerpo del mensaje como JSON
+		},
+	)
+	if err != nil {
+		log.Fatalf("Failed to post a message: %s", err)
+		return
+	}
+}
 
 
 func GetHotelById(c *gin.Context) {
@@ -46,6 +87,8 @@ func InsertHotel(c *gin.Context) {
 		return
 	}
 
+	SendMessage(hotel.HotelID, "CREATE")
+
 	c.JSON(http.StatusCreated, gin.H{"hotel": hotel})
 }
 
@@ -72,6 +115,8 @@ func UpdateHotel(c *gin.Context) {
 		return
 	}
 
+	SendMessage(hotel.HotelID, "UPDATE")
+
 	c.JSON(http.StatusOK, gin.H{"hotel": hotel})
 }
 
@@ -88,6 +133,8 @@ func DeleteHotel(c *gin.Context) {
 		c.JSON(er.Status(), gin.H{"error": er.Message()})
 		return
 	}
+
+	SendMessage(uuid, "DELETE")
 
 	c.JSON(http.StatusOK, gin.H{"success": "Hotel deleted successfully"})
 
