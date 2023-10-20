@@ -1,12 +1,14 @@
 module mvc-go
 
-go 1.21.0
+go 1.18
 
 require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.3.1
+	github.com/joho/godotenv v1.5.1
 	github.com/json-iterator/go v1.1.12
+	github.com/rtt/Go-Solr v0.0.0-20190512221613-64fac99dcae2
 	github.com/sirupsen/logrus v1.9.3
 )
 

@@ -6,7 +6,6 @@ import (
 	"mvc-go/dto"
 
 	e "mvc-go/utils/errors"
-
 	// "github.com/google/uuid"
 )
 
@@ -27,9 +26,9 @@ func init() {
 func (s *searchService) Search(city string, checkInDate string, checkOutDate string) ([]dto.Hotel, e.ApiError) {
 
 	// fetch hotels
-	_ = client.SolrClient.SearchHotels(city)
+	hotels := client.SolrClient.SearchHotels(city)
 
 	// for each hotel start a go rutine and fetch availability from business micro service
 
-	return []dto.Hotel{}, nil
+	return hotels, nil
 }
