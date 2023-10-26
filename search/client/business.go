@@ -8,13 +8,14 @@ import (
 	"os"
 	"io/ioutil"
 	"encoding/json"
+	"time"
 	// log "github.com/sirupsen/logrus"
 )
 
 type businessClient struct{}
 
 type businessClientInterface interface {
-	GetHotelAvailability(id uuid.UUID, checkInDate string, checkOutDate string) (dto.BusinessResponse, error)
+	GetHotelAvailability(id uuid.UUID, checkInDate time.Time, checkOutDate time.Time) (dto.BusinessResponse, error)
 }
 
 var (
@@ -25,11 +26,14 @@ func init() {
 	BusinessClient = &businessClient{}
 }
 
-func (c *businessClient) GetHotelAvailability(id uuid.UUID, checkInDate string, checkOutDate string) (dto.BusinessResponse, error) {
+func (c *businessClient) GetHotelAvailability(id uuid.UUID, checkInDate time.Time, checkOutDate time.Time) (dto.BusinessResponse, error) {
+
+	checkInDateStr := checkInDate.Format("2006-01-02")
+	checkOutDateStr := checkOutDate.Format("2006-01-02")
 
 	BUSINESS_SERVICE_URL := os.Getenv("BUSINESS_SERVICE_URL") 
 	hotelId := id.String()
-	url := fmt.Sprintf("%s/api/availability/%s?checkInDate=%s&checkOutDate=%s", BUSINESS_SERVICE_URL, hotelId, checkInDate, checkOutDate)
+	url := fmt.Sprintf("%s/api/availability/%s?checkInDate=%s&checkOutDate=%s", BUSINESS_SERVICE_URL, hotelId, checkInDateStr, checkOutDateStr)
 	
 	response, err := http.Get(url)
 	if err != nil {

@@ -12,6 +12,8 @@ type Hotel struct {
 	Photos      Photos    `json:"photos"`
 	Amenities   Amenities `json:"amenities"`
 	Active      bool      `json:"active,omitempty"`
+	Thumbnail   string 	  `json:"thumbnail"`
+	Available   bool      `json:"available,omitempty"`
 }
 
 type Hotels []Hotel

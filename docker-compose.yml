@@ -114,6 +114,12 @@ services:
     restart: always
     ports: 
       - 8983:8983
+    entrypoint:
+      - bash
+      - "-c"
+      - "mkdir /var/solr/data; precreate-core hotels; precreate-core hotels_test; exec solr -f"
+    volumes:
+      - solrdata:/var/solr
     networks:
       - app-network
 
@@ -128,4 +134,5 @@ volumes:
   search_go_modules:
   business_go_modules:
   frontend_node_modules:
+  solrdata:
   public:
