@@ -1,11 +1,8 @@
 package db
 
 import (
-	amenitieClient "mvc-go/clients/amenitie"
 	bookingClient "mvc-go/clients/booking"
 	businessClient "mvc-go/clients/business"
-	hotelClient "mvc-go/clients/hotel"
-	photoClient "mvc-go/clients/photo"
 	userClient "mvc-go/clients/user"
 	"os"
 
@@ -42,9 +39,6 @@ func init() {
 
 	// We need to add all CLients that we built
 	userClient.Db = db
-	hotelClient.Db = db
-	photoClient.Db = db
-	amenitieClient.Db = db
 	bookingClient.Db = db
 	businessClient.Db = db
 
@@ -53,10 +47,7 @@ func init() {
 func StartDbEngine() {
 	// We need to migrate all classes model.
 	db.AutoMigrate((&model.User{}))
-	db.AutoMigrate((&model.Hotel{}))
 	db.AutoMigrate((&model.Booking{}))
-	db.AutoMigrate((&model.Photo{}))
-	db.AutoMigrate((&model.Amenitie{}))
 	db.AutoMigrate((&model.HotelMapping{}))
 
 	log.Info("Finishing Migration Database Tables")

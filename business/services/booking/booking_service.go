@@ -3,7 +3,6 @@ package bookingService
 import (
 	"errors"
 	bookingClient "mvc-go/clients/booking"
-	hotelClient "mvc-go/clients/hotel"
 	"mvc-go/dto"
 	"mvc-go/model"
 	"time"
@@ -44,11 +43,13 @@ func (s *bookingService) CreateBooking(bookingDto dto.Booking) (dto.Booking, e.A
 		Active:  true,
 	}
 
-	bookingData := dto.CheckAvailability{
-		HotelID: booking.HotelID,
-		DateIn:  booking.DateIn,
-		DateOut: booking.DateOut,
-	}
+	/*
+		bookingData := dto.CheckAvailability{
+			HotelID: booking.HotelID,
+			DateIn:  booking.DateIn,
+			DateOut: booking.DateOut,
+		}
+	*/
 
 	if booking.Total <= 0 {
 		return dto.Booking{}, e.NewBadRequestApiError("You cannot have a zero or negative amount for Total value")
@@ -60,11 +61,6 @@ func (s *bookingService) CreateBooking(bookingDto dto.Booking) (dto.Booking, e.A
 
 	if booking.DateIn.After(booking.DateOut) || booking.DateIn.Equal(booking.DateOut) {
 		return dto.Booking{}, e.NewBadRequestApiError("You should not have a DateIn greater or equal than the DateOut")
-	}
-
-	availableRooms := hotelClient.HotelClient.GetAvailableRooms(bookingData)
-	if booking.Rooms > uint(availableRooms) {
-		return dto.Booking{}, e.NewBadRequestApiError("You cannot book more rooms than the ones currently available")
 	}
 
 	booking = bookingClient.BookingClient.InsertBooking(booking)
