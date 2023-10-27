@@ -1,6 +1,7 @@
 package db
 
 import (
+	hotelClient "mvc-go/clients/hotel"
 	"os"
     "context"
 	// "go.mongodb.org/mongo-driver/bson" 
@@ -10,7 +11,6 @@ import (
 
 var (
 	err error
-	MongoDb *mongo.Database
 	client *mongo.Client
 )
 
@@ -40,7 +40,8 @@ func Init_db()(error){
 	// return err
 	// }  
 
-	MongoDb = client.Database(DBName) 
+	hotelClient.Db = client.Database(DBName) 
+	
 
 	// fmt.Println("Available datatabases:") 
 	// fmt.Println(dbNames)

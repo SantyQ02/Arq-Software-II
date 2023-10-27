@@ -3,11 +3,11 @@ package hotelClient
 import (
 	"errors"
 	"mvc-go/model"
-	"mvc-go/db"
 	"context"
 
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type hotelClient struct{}
@@ -21,6 +21,8 @@ type hotelClientInterface interface {
 
 var (
 	HotelClient hotelClientInterface
+	Db *mongo.Database 
+	
 )
 
 func init() {
@@ -30,9 +32,8 @@ func init() {
 
 func (c *hotelClient) GetHotelById(id string) model.Hotel {
 	var hotel model.Hotel
-	db:=db.MongoDb
 
-	err := db.Collection("hotels").FindOne(context.TODO(), bson.D{{"HotelID", id}}).Decode(&hotel)
+	err := Db.Collection("hotels").FindOne(context.TODO(), bson.D{{"HotelID", id}}).Decode(&hotel)
 	if err != nil {
 		log.Error("")
 		return model.Hotel{}
@@ -43,8 +44,7 @@ func (c *hotelClient) GetHotelById(id string) model.Hotel {
 
 
 func (c *hotelClient) InsertHotel(hotel model.Hotel) model.Hotel {
-	db:=db.MongoDb
-	_, err := db.Collection("hotels").InsertOne(context.TODO(), &hotel)
+	_, err := Db.Collection("hotels").InsertOne(context.TODO(), &hotel)
 
 	if err != nil {
 		log.Error("")
@@ -55,8 +55,7 @@ func (c *hotelClient) InsertHotel(hotel model.Hotel) model.Hotel {
 }
 
 func (c *hotelClient) UpdateHotel(hotel model.Hotel) model.Hotel {
-	db:=db.MongoDb
-	_, err := db.Collection("hotels").UpdateOne(context.TODO(), bson.D{{"HotelID", hotel.HotelID}},bson.D{{"$set",&hotel}})
+	_, err := Db.Collection("hotels").UpdateOne(context.TODO(), bson.D{{"HotelID", hotel.HotelID}},bson.D{{"$set",&hotel}})
 
 	if err != nil {
 		log.Error(err.Error())
@@ -66,8 +65,7 @@ func (c *hotelClient) UpdateHotel(hotel model.Hotel) model.Hotel {
 }
 
 func (c *hotelClient) DeleteHotel(id string) error {
-	db:=db.MongoDb
-	_, err := db.Collection("hotels").DeleteOne(context.TODO(), bson.D{{"HotelID", id}})
+	_, err := Db.Collection("hotels").DeleteOne(context.TODO(), bson.D{{"HotelID", id}})
 	if err != nil {
 		log.Debug(id)
 		log.Error(err.Error())
