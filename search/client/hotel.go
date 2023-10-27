@@ -31,7 +31,7 @@ func (c *hotelClient) GetHotel(id uuid.UUID) (dto.Hotel, error) {
 
 	HOTEL_SERVICE_URL := os.Getenv("HOTEL_SERVICE_URL") 
 	hotelId := id.String()
-	url := fmt.Sprintf("%s/api/hotels/%s", HOTEL_SERVICE_URL, hotelId)
+	url := fmt.Sprintf("%s/api/hotel/%s", HOTEL_SERVICE_URL, hotelId)
 	
 	response, err := http.Get(url)
 	if err != nil {
