@@ -2,9 +2,9 @@ package middlewareService
 
 import (
 	"net/http"
-	"encoding/json"
+	// "encoding/json"
 	"strings"
-	"bytes"
+	// "bytes"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,10 +23,10 @@ func init() {
 	MiddlewareService = &middlewareService{}
 }
 
-type Bodystruct struct {
-    IsAdmin bool `json:"isAdmin,omitempty"`
-	Token  string `json:"token,omitempty"`
-}
+// type Bodystruct struct {
+//     IsAdmin bool `json:"isAdmin,omitempty"`
+// 	Token  string `json:"token,omitempty"`
+// }
 
 
 func (m *middlewareService) CheckAdmin() gin.HandlerFunc {
@@ -49,23 +49,23 @@ func (m *middlewareService) CheckAdmin() gin.HandlerFunc {
 			return
 		}
 
-		businessURL := "http://business:8080/checkadmin"
+		businessURL := "http://business:8080/api/business/checkadmin"
 		// JSON body
-		body := Bodystruct{
-			IsAdmin: false,
-			Token: token,
-		}
+		// body := Bodystruct{
+		// 	Token: token,
+		// }
 
-		jsonData, _ := json.Marshal(body)
+		// jsonData, _ := json.Marshal(body)
 
 		// Create a HTTP post request
-		r, err := http.NewRequest("POST", businessURL, bytes.NewBuffer(jsonData))
+		r, err := http.NewRequest("GET", businessURL, nil)
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 			return
 		}
 
-		r.Header.Add("Content-Type", "application/json")
+		// r.Header.Add("Content-Type", "application/json")
+		r.Header.Add("Authorization", authorizationHeader)
 
 		client := &http.Client{}
 		res, err := client.Do(r)
@@ -73,24 +73,27 @@ func (m *middlewareService) CheckAdmin() gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to make request!"})
 		}
 
-		defer res.Body.Close()
+		// defer res.Body.Close()
 
-		response := &Bodystruct{}
-		derr := json.NewDecoder(res.Body).Decode(response)
+		// response := &Bodystruct{}
+		// derr := json.NewDecoder(res.Body).Decode(response)
 
-		if derr != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode response!"})
-		}
+		// if derr != nil {
+		// 	ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode response!"})
+		// }
 
 		if res.StatusCode != http.StatusOK {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal api error!"})
+			return
+		}else {
+			ctx.Next()
 		}
 
-		if response.IsAdmin{
-			ctx.Next()
-		}else {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Admin privileges required!"})
-			return
-		}
+		// if response.IsAdmin{
+		// 	ctx.Next()
+		// }else {
+		// 	ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Admin privileges required!"})
+		// 	return
+		// }
 	}
 }

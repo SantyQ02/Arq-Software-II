@@ -139,7 +139,7 @@ func (s *hotelService) UpdateHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 	if hotel.HotelID == "" {
 		return dto.Hotel{}, e.NewInternalServerApiError("Error trying update hotel", errors.New(""))
 	}
-	hotelDto.HotelID,_ = uuid.Parse(hotel.HotelID)
+	// hotelDto.HotelID,_ = uuid.Parse(hotel.HotelID)
 
 	return hotelDto, nil
 }

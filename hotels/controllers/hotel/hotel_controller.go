@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"encoding/json"
 
+	"net/http"
 	"mvc-go/dto"
 	hotelService "mvc-go/services/hotel"
 	"github.com/google/uuid"
@@ -19,6 +20,11 @@ import (
 type Message struct{
     HotelID uuid.UUID  `json:"hotel_id"`
     Action  string `json:"action"`
+}
+
+type Bodystruct struct {
+    HotelID uuid.UUID `json:"hotel_id,omitempty"`
+	AmadeusID  string `json:"amadeus_id,omitempty"`
 }
 
 func SendMessage(id uuid.UUID, action string){
@@ -88,6 +94,32 @@ func InsertHotel(c *gin.Context) {
 	}
 
 	SendMessage(hotel.HotelID, "CREATE")
+
+	businessURL := "http://business:8080/api/business/mapping-hotel"
+
+	// JSON body
+	body := Bodystruct{
+		HotelID: hotel.HotelID,
+		AmadeusID: hotel.AmadeusID,
+	}
+
+	jsonData, _ := json.Marshal(body)
+
+	// Create a HTTP post request
+	r, err := http.NewRequest("POST", businessURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	r.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	res, err := client.Do(r)
+
+	if err != nil {
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to make request!"})
+		}
 
 	c.JSON(http.StatusCreated, gin.H{"hotel": hotel})
 }
