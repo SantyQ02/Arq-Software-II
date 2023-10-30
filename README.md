@@ -1,6 +1,10 @@
 # Test
 
-docker-compose up db_business mongodb memcached queue solr
+    docker-compose up db_business mongodb memcached queue solr
+
+# Business Testing
+
+    docker-compose up db_business memcached business --build
 
 # Hotel Reservation Project with Microservices
 
