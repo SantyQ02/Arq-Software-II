@@ -1,3 +1,5 @@
+import SearchForm from "./new/SearchForm";
+
 export default function Banner() {
   const handleScroll = (event, id) => {
     event.preventDefault(); // Evitar el comportamiento predeterminado del enlace
@@ -14,7 +16,7 @@ export default function Banner() {
 
   
     return (
-      <div className="relative overflow-hidden bg-white">
+      <div className="relative overflow-hidden bg-white h-max contents">
         <div className="pb-80 pt-16 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
           <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
             <div className="sm:max-w-lg">
@@ -24,9 +26,10 @@ export default function Banner() {
               <p className="mt-4 text-xl text-gray-500">
               Experience a haven in our new summer hotel collection, shielding you from the unforgiving world outside.
               </p>
+              <SearchForm />
             </div>
             <div>
-              <div className="mt-10">
+              <div className="mt-10 relative">
                 {/* Decorative image grid */}
                 <div
                   aria-hidden="true"
@@ -92,18 +95,18 @@ export default function Banner() {
                     </div>
                   </div>
                 </div>
-  
-                <a
-                  href="#hotels-list"
-                  onClick={e => handleScroll(e, "hotels-list")}
-                  className="inline-block rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-center font-medium text-white hover:bg-indigo-700"
-                >
-                  Book Now
-                </a>
+              
               </div>
             </div>
           </div>
         </div>
+        {/* <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br> */}
       </div>
     )
   }
