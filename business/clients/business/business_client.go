@@ -77,7 +77,7 @@ func (s *businessClient) GetAmadeusAvailability(amadeusID string, checkInDate ti
 		return false, e.NewInternalServerApiError("Error getting response from Amadeus availability! (Status-Code)", errors.New(""))
 	}
 
-	var availabilityResponse availabilityResponse
+	var availabilityResponse AvailabilityResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&availabilityResponse)
 	if err != nil {
@@ -150,7 +150,7 @@ type accessTokenResponse struct {
 	Scope           string `json:"scope"`
 }
 
-type availabilityResponse struct {
+type AvailabilityResponse struct {
 	Data []struct {
 		Available bool `json:"available" binding:"required"`
 	}
