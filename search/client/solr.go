@@ -33,7 +33,7 @@ func init() {
 func (c *solrClient) SearchHotels(city string) ([]dto.Hotel, error) {
 	query := &solr.Query{
 		Params: solr.URLParamMap{
-			"q":    []string{fmt.Sprintf("city_code:\"%s\"", city)}, // Consulta con filtro por ciudad
+			"q":    []string{fmt.Sprintf("city_code:\"%s\" AND active:true", city)}, // Consulta con filtro por ciudad
 		},
 	}
 
