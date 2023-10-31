@@ -3,11 +3,15 @@ import HotelsList from '@/components/search/HotelListCustom'
 import SearchForm from '@/components/home/new/SearchForm'
 import MainLayout from '@/layouts/MainLayout'
 import { useRouter } from 'next/router'
+import { search_hotels } from '@/lib/api/search'
 
 export async function getServerSideProps({query}){
+  const {city_code, check_in_date, check_out_date} = query
+  const all_hotels = await search_hotels(city_code, check_in_date, check_out_date)
+  const hotels = all_hotels.filter(hotel => hotel.available == true)
   return {
         props: {
-          hotels: mockHotels,
+          hotels,
         },
       };
 }

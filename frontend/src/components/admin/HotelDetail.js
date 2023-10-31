@@ -169,7 +169,7 @@ export default function HotelDetail({ hotel, setHotel }) {
                     {({ selected }) => (
                       <>
                         <span className="absolute inset-0 rounded-md overflow-hidden">
-                          <Image src={`${process.env.NEXT_PUBLIC_URL_API}/api/public/${photo.url}`} alt="" className="w-full h-full object-center object-cover" width={1000} height={1000}/>
+                          <Image src={`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/public/${photo.url}`} alt="" className="w-full h-full object-center object-cover" width={1000} height={1000}/>
                         </span>
                         <button className='z-50 absolute end-0 top-0'
                           onClick={e => handleDeletePhoto(e, photo.photo_id)}>
@@ -194,7 +194,7 @@ export default function HotelDetail({ hotel, setHotel }) {
               {hotel != null && hotel.photos != null && hotel.photos.map((photo) => (
                 <Tab.Panel key={photo.photo_id}>
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_URL_API}/api/public/${photo.url}`}
+                    src={`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/public/${photo.url}`}
                     className="w-full object-center object-cover sm:rounded-lg h-96"
                     width={1000} height={1000}
                   />

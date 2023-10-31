@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     try {
       const { hotel_id, date_in, date_out } = req.query;
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api/hotel/availableRooms?hotel_id=${hotel_id}&date_in=${date_in}&date_out=${date_out}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/hotel/availableRooms?hotel_id=${hotel_id}&date_in=${date_in}&date_out=${date_out}`, {
         method: 'GET',
         headers: {
           ...req.headers.JSON,

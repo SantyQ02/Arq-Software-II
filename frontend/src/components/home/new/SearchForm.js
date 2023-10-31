@@ -45,8 +45,8 @@ const SearchForm = ({className="", city_code="CBA", check_in_date=null, check_ou
                             required
                             className="h-full w-full rounded-md border-0 bg-transparent py-2.5 pl-2  text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm relative transition-all duration-300 py-2.5 pl-4  border-r-8 w-full border-white rounded-lg tracking-wide font-light text-sm placeholder-gray-400 bg-white focus:ring disabled:opacity-40 disabled:cursor-not-allowed focus:border-blue-500 focus:ring-blue-500/20 light"
                         >
-                            <option>Cordoba</option>
-                            <option>2</option>
+                            <option value={"CBA"}>Cordoba</option>
+                            <option value={"LON"}>Londres</option>
                             <option>3</option>
                             <option>4</option>
                             <option>5</option>

@@ -27,7 +27,7 @@ export default async function handler(req, res) {
             //console.log(fileName)
 
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api/hotel/photo/${hotelID}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/hotel/photo/${hotelID}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     url: fileName

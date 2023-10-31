@@ -103,9 +103,7 @@ export async function insertPhoto(hotelID, file) {
     // });
 
     try {
-        const res = await axios.post(`${process.env.NEXT_PUBLIC_URL_API_CLIENT}/api/hotel/photo/upload/${hotelID}`, formData, config)
-        // const res = await axios.post(`${process.env.NEXT_PUBLIC_URL_API}/api/hotel/photo/upload/${hotelID}`, formData, config)
-        // const res = await axios.post(`/api/hotel/photo/${hotelID}`, formData, config)
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS_CLIENT}/api/hotel/upload/${hotelID}`, formData, config)
         if (res.status === 201) {
             alert('success', 'Photo added successfully')
 
@@ -283,7 +281,7 @@ export async function getAvailableHotels(rooms, date_in, date_out){
 
 export async function getHotelById(id){
     try {
-        const res = await axios.get(`/api/hotel/${id}`, { withCredentials: true })
+        const res = await axios.get(`http://localhost:3000/api/hotel/${id}`, { withCredentials: true })
         if (res.status === 200) {
             return res.data.hotel
         }
@@ -293,7 +291,7 @@ export async function getHotelById(id){
         }
     } catch (error) {
         const errorMessage = error.response?.data?.error ?? 'Unknown error occurred';
-        //console.log(errorMessage)
+        console.log(error)
         return null
     }
 }

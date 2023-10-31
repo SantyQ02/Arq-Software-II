@@ -112,8 +112,8 @@ export default function HotelDetail({ hotel}) {
                                                 <span className="sr-only">{photo.url}</span>
                                                 <span className="absolute inset-0 rounded-md overflow-hidden">
                                                     <Image 
-                                                    src={`${photo.url}`} 
-                                                    // src={`${process.env.NEXT_PUBLIC_URL_API}/api/public/${photo.url}`} 
+                                                    // src={`${photo.url}`} 
+                                                    src={`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/public/${photo.url}`} 
                                                     alt="" 
                                                     className=" object-center object-cover" 
                                                     fill />
@@ -136,8 +136,8 @@ export default function HotelDetail({ hotel}) {
                             {hotel.photos != null && hotel.photos.map((photo) => (
                                 <Tab.Panel key={photo.photo_id}>
                                     <Image
-                                        src={`${photo.url}`}
-                                        // src={`${process.env.NEXT_PUBLIC_URL_API}/api/public/${photo.url}`}
+                                        // src={`${photo.url}`}
+                                        src={`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/public/${photo.url}`}
                                         alt={photo.url}
                                         className="w-full object-center object-cover sm:rounded-lg h-96"
                                         width={1000}

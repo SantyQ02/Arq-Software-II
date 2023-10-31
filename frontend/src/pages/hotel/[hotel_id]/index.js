@@ -1,10 +1,13 @@
 import HotelDetail from '@/components/hotel/HotelDetail'
 import MainLayout from '@/layouts/MainLayout'
+import { getHotelById } from '@/lib/api/hotel';
 
 export async function getServerSideProps({query}){
+  const {hotel_id} = query
+  const hotel = await getHotelById(hotel_id)
   return {
         props: {
-          hotel: mockHotel,
+          hotel,
         },
       };
 }

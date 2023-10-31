@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     try {
       const { photoID } = req.query;
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api/hotel/photo/${photoID}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/hotel/photo/${photoID}`, {
         method: 'DELETE',
         headers: {
           ...req.headers.JSON,

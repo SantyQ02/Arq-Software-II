@@ -2,15 +2,10 @@
 
 export default async function handler(req, res) {
     try {
-      const { rooms, date_in, date_out } = req.query;
+      const {city_code, check_in_date, check_out_date } = req.query;
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api/hotel/available?rooms=${rooms}&date_in=${date_in}&date_out=${date_out}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVICE_SEARCH}/api/search?&city=${city_code}&check_in_date=${check_in_date}&check_out_date=${check_out_date}`, {
         method: 'GET',
-        headers: {
-          ...req.headers.JSON,
-          'Cookie': req.headers.cookie || ''
-        },
-        credentials: 'include',
       });
   
       const data = await response.json();

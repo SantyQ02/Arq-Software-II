@@ -79,8 +79,9 @@ const BookForm = ({ hotel, setDataCheck }) => {
             return
         }
         const create_booking = async () => {
-            await createBooking(rooms, total, start_date, end_date, hotel.hotel_id, user.user_id)
+            const success = await createBooking(rooms, total, start_date, end_date, hotel.hotel_id, user.user_id)
             // //console.log("\nrooms: ",rooms,"\ntotal: ", total,"\ndate_in: ", dates.startDate,"\ndate_out: ", dates.endDate,"\nhotel_id: ", hotel.hotel_id,"\nuser_id: ", user.user_id)
+            router.push(`/confirmation/${success ? 'success' : 'error'}`); 
         }
 
         create_booking()

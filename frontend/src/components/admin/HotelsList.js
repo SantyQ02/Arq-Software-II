@@ -48,7 +48,7 @@ export default function HotelsList() {
                                                 
                                             <div className="ml-4 sm:ml-0 flex-shrink-0">
                                                 <Image
-                                                    src={`${process.env.NEXT_PUBLIC_URL_API}/api/public/${hotel.photos != null ? hotel.photos[0].url : ""}`}
+                                                    src={`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/public/${hotel.photos != null ? hotel.photos[0].url : ""}`}
                                                     alt={hotel.title}
                                                     className="w-24 h-24 rounded-md object-center object-cover sm:w-48 sm:h-48"
                                                     width={1000}
