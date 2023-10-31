@@ -29,6 +29,14 @@ func CheckAvailability(c *gin.Context) {
 		return
 	}
 
+	if checkInDate.Before(time.Now()) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "You should not have a checkInDate earlier than the current date"})
+	}
+
+	if checkInDate.After(checkOutDate) || checkInDate.Equal(checkOutDate) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "You should not have a checkInDate greater or equal than the checkOutDate"})
+	}
+
 	availability, er := businessService.BusinessService.CheckAvailability(uuid, checkInDate, checkOutDate)
 	if er != nil {
 		c.JSON(er.Status(), gin.H{"error": er.Message()})
