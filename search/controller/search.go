@@ -26,6 +26,14 @@ func Search(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "check_out_date must be a valid value"})
 		return
 	}
+	if checkInDate.Before(time.Now()) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "You should not have a checkInDate earlier than the current date"})
+	}
+
+	if checkInDate.After(checkOutDate) || checkInDate.Equal(checkOutDate) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "You should not have a checkInDate greater or equal than the checkOutDate"})
+	}
+
 	hotels, er := service.SearchService.Search(city, checkInDate, checkOutDate)
 	if er != nil {
 		c.JSON(er.Status(), gin.H{"error": er.Message()})
