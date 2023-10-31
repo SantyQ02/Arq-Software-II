@@ -5,10 +5,9 @@ import (
 	"mvc-go/dto"
 
 	e "mvc-go/utils/errors"
-	"sync"
+	// "sync"
 	"time"
 	// "github.com/google/uuid"
-	// log "github.com/sirupsen/logrus"
 )
 
 type searchService struct{}
@@ -37,13 +36,13 @@ func (s *searchService) Search(city string, checkInDate time.Time, checkOutDate 
 	}
 
 	// for each hotel start a go rutine and fetch availability from business micro service
-	var wg sync.WaitGroup
-	errCh := make(chan error, 1)
+	// var wg sync.WaitGroup
+	errCh := make(chan error, len(hotels))
 
 	for i := range hotels {
-		wg.Add(1)
+		// wg.Add(1)
 		go func (i int, errCh chan error) {
-			defer wg.Done()
+			// defer wg.Done()
 			hotelCopy := &hotels[i]
 			businessRes, er := client.BusinessClient.GetHotelAvailability(hotelCopy.HotelID, checkInDate, checkOutDate)
 			if er != nil {
@@ -56,21 +55,28 @@ func (s *searchService) Search(city string, checkInDate time.Time, checkOutDate 
 			} else {
 				hotelCopy.Available = false
 			}
+			errCh <- nil
 
 		}(i, errCh)
 	}
 
-	wg.Wait()
-	close(errCh)
+	for _ = range hotels {
+		err := <-errCh
+		if err != nil {
+			return []dto.Hotel{}, e.NewInternalServerApiError("Something went wrong checking availability", err)
+		}
+	}
+
+	// wg.Wait()
 	
-	select {
-    case err := <-errCh:
-        if err != nil {
-            return []dto.Hotel{}, e.NewInternalServerApiError("Something went wrong checking availability", err)
-        }
-    default:
-        // No se produjo un error diferente de nil, continúa con la lógica
-    }
+	// select {
+    // case err := <-errCh:
+    //     if err != nil {
+    //         return []dto.Hotel{}, e.NewInternalServerApiError("Something went wrong checking availability", err)
+    //     }
+    // default:
+    //     // No se produjo un error diferente de nil, continúa con la lógica
+    // }
 
 
 	return hotels, nil
