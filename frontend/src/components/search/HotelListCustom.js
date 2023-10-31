@@ -18,7 +18,7 @@ export default function HotelsList({ hotels }) {
         <>
             <div className="bg-white" id="hotels-list">
                 <div className="max-w-2xl mx-auto pb-24 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                    <h2 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-xl">Search Results</h2>
+                    <h2 className="text-xl font-extrabold tracking-tight text-gray-900 sm:text-xl">{hotels.length === 0 ? "There are not available hotels" : "Available hotels"}</h2>
                     <form className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start xl:gap-x-16">
                         <section aria-labelledby="cart-heading" className="lg:col-span-12">
                             <h2 id="cart-heading" className="sr-only">
