@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"time"
+	"errors"
 	// log "github.com/sirupsen/logrus"
 )
 
@@ -33,7 +34,7 @@ func (c *businessClient) GetHotelAvailability(id uuid.UUID, checkInDate time.Tim
 
 	BUSINESS_SERVICE_URL := os.Getenv("BUSINESS_SERVICE_URL") 
 	hotelId := id.String()
-	url := fmt.Sprintf("%s/api/availability/%s?checkInDate=%s&checkOutDate=%s", BUSINESS_SERVICE_URL, hotelId, checkInDateStr, checkOutDateStr)
+	url := fmt.Sprintf("%s/api/business/availability/%s?checkInDate=%s&checkOutDate=%s", BUSINESS_SERVICE_URL, hotelId, checkInDateStr, checkOutDateStr)
 	
 	response, err := http.Get(url)
 	if err != nil {
@@ -42,7 +43,7 @@ func (c *businessClient) GetHotelAvailability(id uuid.UUID, checkInDate time.Tim
 
 	// Validate API Error
 	if response.StatusCode != http.StatusOK {
-		return dto.BusinessResponse{}, err
+		return dto.BusinessResponse{}, errors.New("Error checking availability")
 	}
 
 	// Read response payload bytes

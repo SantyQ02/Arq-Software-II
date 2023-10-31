@@ -32,6 +32,9 @@ func (s *searchService) Search(city string, checkInDate time.Time, checkOutDate 
 	if err != nil {
 		return []dto.Hotel{}, e.NewInternalServerApiError("Something went wrong searching hotels", err)
 	}
+	if len(hotels) == 0 {
+		return []dto.Hotel{}, nil
+	}
 
 	// for each hotel start a go rutine and fetch availability from business micro service
 	var wg sync.WaitGroup
