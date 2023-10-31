@@ -49,15 +49,15 @@ func TestSearch(t *testing.T) {
 		},
 	}
 
-	checkInDate, _ := time.Parse("2006-01-02", "2023-10-25")
-	checkOutDate, _ := time.Parse("2006-01-02", "2023-11-25")
+	checkInDate, _ := time.Parse("2006-01-02", "2023-12-25")
+	checkOutDate, _ := time.Parse("2006-01-02", "2024-01-25")
 
 	searchMockService.On("Search", city, checkInDate, checkOutDate).Return(hotelsDto, nil)
 
 	router := gin.Default()
 	router.GET("/test/search", Search)
 
-	req, _ := http.NewRequest("GET", "/test/search?city=CBA&check_in_date=2023-10-25&check_out_date=2023-11-25", nil)
+	req, _ := http.NewRequest("GET", "/test/search?city=CBA&check_in_date=2023-12-25&check_out_date=2024-01-25", nil)
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
@@ -76,15 +76,15 @@ func TestSearchErrorService(t *testing.T) {
 
 	city := "CBA"
 
-	checkInDate, _ := time.Parse("2006-01-02", "2023-10-25")
-	checkOutDate, _ := time.Parse("2006-01-02", "2023-11-25")
+	checkInDate, _ := time.Parse("2006-01-02", "2023-12-25")
+	checkOutDate, _ := time.Parse("2006-01-02", "2024-01-25")
 
 	searchMockService.On("Search", city, checkInDate, checkOutDate).Return([]dto.Hotel{}, e.NewInternalServerApiError("Something went wrong searching hotels", errors.New("")))
 
 	router := gin.Default()
 	router.GET("/test/search", Search)
 
-	req, _ := http.NewRequest("GET", "/test/search?city=CBA&check_in_date=2023-10-25&check_out_date=2023-11-25", nil)
+	req, _ := http.NewRequest("GET", "/test/search?city=CBA&check_in_date=2023-12-25&check_out_date=2024-01-25", nil)
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
@@ -103,7 +103,7 @@ func TestSearchBadRequestCityValue(t *testing.T) {
 	router := gin.Default()
 	router.GET("/test/search", Search)
 
-	req, _ := http.NewRequest("GET", "/test/search?city=&check_in_date=2023-10-25&check_out_date=2023-11-25", nil)
+	req, _ := http.NewRequest("GET", "/test/search?city=&check_in_date=2023-12-25&check_out_date=2024-01-25", nil)
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
@@ -122,7 +122,7 @@ func TestSearchBadRequestDateValue(t *testing.T) {
 	router := gin.Default()
 	router.GET("/test/search", Search)
 
-	req, _ := http.NewRequest("GET", "/test/search?city=CBA&check_in_date=2023-10-25ff&check_out_date=2023-11-25ff", nil)
+	req, _ := http.NewRequest("GET", "/test/search?city=CBA&check_in_date=2023-12-25ff&check_out_date=2024-01-25ff", nil)
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
