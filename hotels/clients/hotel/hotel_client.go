@@ -8,6 +8,11 @@ import (
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"github.com/google/uuid"
+
 )
 
 type hotelClient struct{}
@@ -17,6 +22,7 @@ type hotelClientInterface interface {
 	InsertHotel(hotel model.Hotel) model.Hotel
 	UpdateHotel(hotel model.Hotel) model.Hotel
 	DeleteHotel(id string) error
+	HotelMapping(hotel model.Hotel) error
 }
 
 var (
@@ -28,6 +34,12 @@ var (
 func init() {
 	HotelClient = &hotelClient{}
 }
+
+type Bodystruct struct {
+    HotelID uuid.UUID `json:"hotel_id,omitempty"`
+	AmadeusID  string `json:"amadeus_id,omitempty"`
+}
+
 
 
 func (c *hotelClient) GetHotelById(id string) model.Hotel {
@@ -75,3 +87,34 @@ func (c *hotelClient) DeleteHotel(id string) error {
 }
 
 
+func (c *hotelClient) HotelMapping(hotel model.Hotel) error {
+
+	businessURL := "http://business:8080/api/business/mapping-hotel"
+
+	hotelID,_ := uuid.Parse(hotel.HotelID)
+
+	// JSON body
+	body := Bodystruct{
+		HotelID:   hotelID,
+		AmadeusID: hotel.AmadeusID,
+	}
+
+	jsonData, _ := json.Marshal(body)
+
+	// Create a HTTP post request
+	r, err := http.NewRequest("POST", businessURL, bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+
+	r.Header.Add("Content-Type", "application/json")
+
+	client := &http.Client{}
+	_, er := client.Do(r)
+
+	if er != nil {
+		return er
+	}
+
+	return nil
+}

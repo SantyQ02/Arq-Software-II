@@ -5,11 +5,12 @@ import (
 	"mvc-go/dto"
 	"mvc-go/model"
 	"errors"
-
-
 	e "mvc-go/utils/errors"
-
 	"github.com/google/uuid"
+	"mvc-go/queue"
+	"encoding/json"
+	amqp "github.com/rabbitmq/amqp091-go"
+	log "github.com/sirupsen/logrus"
 )
 
 type hotelService struct{}
@@ -20,6 +21,7 @@ type hotelServiceInterface interface {
 	DeleteHotel(id uuid.UUID) e.ApiError
 	GetHotelById(id uuid.UUID) (dto.Hotel, e.ApiError)
 	InsertPhoto(photoDto dto.Photo, hotelId uuid.UUID) (dto.Photo, e.ApiError)
+	SendMessage(id uuid.UUID, action string)
 }
 
 var (
@@ -28,6 +30,39 @@ var (
 
 func init() {
 	HotelService = &hotelService{}
+}
+
+type Message struct{
+    HotelID uuid.UUID  `json:"hotel_id"`
+    Action  string `json:"action"`
+}
+
+func (s *hotelService) SendMessage(id uuid.UUID, action string){
+
+	q := queue.Queue
+	ch := queue.Channel
+
+	message := Message{
+        HotelID: id,
+        Action:  action,
+    }
+
+	messageJSON, err := json.Marshal(message)
+
+	err = ch.Publish(
+		"",     // Intercambio (exchange) predeterminado
+		q.Name, // Nombre de la cola
+		false,  // No mandar confirmación
+		false,  // No es mandatorio
+		amqp.Publishing{
+            ContentType: "application/json", // Establece el tipo de contenido a JSON
+            Body:        messageJSON,         // Establece el cuerpo del mensaje como JSON
+		},
+	)
+	if err != nil {
+		log.Fatalf("Failed to post a message: %s", err)
+		return
+	}
 }
 
 func (s *hotelService) InsertHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
@@ -68,7 +103,7 @@ func (s *hotelService) InsertHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 
 	hotel = hotelClient.HotelClient.InsertHotel(hotel)
 	if hotel.HotelID == "" {
-		return dto.Hotel{}, e.NewInternalServerApiError("Error trying insert hotel", errors.New(""))
+		return dto.Hotel{}, e.NewInternalServerApiError("Error trying to insert hotel", errors.New(""))
 	}
 
 	hotelDto.HotelID,_ = uuid.Parse(hotel.HotelID)
@@ -95,6 +130,10 @@ func (s *hotelService) InsertHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 		hotelDto.Amenities = append(hotelDto.Amenities, dtoAmenity)
 	}
 
+	err := hotelClient.HotelClient.HotelMapping(hotel)
+	if err != nil {
+		return dto.Hotel{}, e.NewInternalServerApiError("Error trying to send request", errors.New(""))
+	}
 
 	return hotelDto, nil
 }
@@ -137,7 +176,7 @@ func (s *hotelService) UpdateHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 
 	hotel = hotelClient.HotelClient.UpdateHotel(hotel)
 	if hotel.HotelID == "" {
-		return dto.Hotel{}, e.NewInternalServerApiError("Error trying update hotel", errors.New(""))
+		return dto.Hotel{}, e.NewInternalServerApiError("Error trying to update hotel", errors.New(""))
 	}
 	// hotelDto.HotelID,_ = uuid.Parse(hotel.HotelID)
 
@@ -217,7 +256,7 @@ func (s *hotelService) InsertPhoto(photoDto dto.Photo, hotelId uuid.UUID) (dto.P
 
 	hotel = hotelClient.HotelClient.UpdateHotel(hotel)
 	if hotel.HotelID == "" {
-		return dto.Photo{}, e.NewInternalServerApiError("Error trying insert photo", errors.New(""))
+		return dto.Photo{}, e.NewInternalServerApiError("Error trying to insert photo", errors.New(""))
 	}
 
 	photoDto.PhotoID,_ = uuid.Parse(photo.PhotoID)
