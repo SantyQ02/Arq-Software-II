@@ -20,7 +20,6 @@ type businessService struct{}
 type businessServiceInterface interface {
 	CheckAvailability(id uuid.UUID, checkInDate time.Time, checkOutDate time.Time) (bool, e.ApiError)
 	MapHotel(hotelMappingDto dto.HotelMapping) (dto.HotelMapping, e.ApiError)
-	HotelIDToAmadeusID(hotelID uuid.UUID) (string, e.ApiError)
 	CheckAdmin(userID uuid.UUID) (bool, e.ApiError)
 }
 
@@ -40,9 +39,9 @@ func (s *businessService) CheckAvailability(id uuid.UUID, checkInDate time.Time,
 		return bytesToBool(availability), nil
 	}
 
-	amadeusID, er := BusinessService.HotelIDToAmadeusID(id)
-	if er != nil {
-		return false, er
+	amadeusID := businessClient.BusinessClient.GetAmadeusIDByHotelID(id)
+	if amadeusID == "" {
+		return false, e.NewNotFoundApiError("Hotel not found!")
 	}
 
 	available, err := businessClient.BusinessClient.GetAmadeusAvailability(amadeusID, checkInDate, checkOutDate)
@@ -67,15 +66,6 @@ func (s *businessService) MapHotel(hotelMappingDto dto.HotelMapping) (dto.HotelM
 	}
 
 	return hotelMappingDto, nil
-}
-
-func (s *businessService) HotelIDToAmadeusID(hotelID uuid.UUID) (string, e.ApiError) {
-	amadeusID := businessClient.BusinessClient.GetAmadeusIDByHotelID(hotelID)
-	if amadeusID == "" {
-		return "", e.NewNotFoundApiError("Hotel not found!")
-	}
-
-	return amadeusID, nil
 }
 
 func bytesToBool(data []byte) bool {

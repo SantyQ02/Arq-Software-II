@@ -3,6 +3,7 @@ package bookingService
 import (
 	"errors"
 	bookingClient "mvc-go/clients/booking"
+	businessClient "mvc-go/clients/business"
 	"mvc-go/dto"
 	"mvc-go/model"
 	"time"
@@ -34,7 +35,6 @@ func init() {
 
 func (s *bookingService) CreateBooking(bookingDto dto.Booking) (dto.Booking, e.ApiError) {
 	booking := model.Booking{
-		Rooms:   bookingDto.Rooms,
 		Total:   bookingDto.Total,
 		DateIn:  bookingDto.DateIn,
 		DateOut: bookingDto.DateOut,
@@ -42,14 +42,6 @@ func (s *bookingService) CreateBooking(bookingDto dto.Booking) (dto.Booking, e.A
 		HotelID: bookingDto.HotelID,
 		Active:  true,
 	}
-
-	/*
-		bookingData := dto.CheckAvailability{
-			HotelID: booking.HotelID,
-			DateIn:  booking.DateIn,
-			DateOut: booking.DateOut,
-		}
-	*/
 
 	if booking.Total <= 0 {
 		return dto.Booking{}, e.NewBadRequestApiError("You cannot have a zero or negative amount for Total value")
@@ -61,6 +53,20 @@ func (s *bookingService) CreateBooking(bookingDto dto.Booking) (dto.Booking, e.A
 
 	if booking.DateIn.After(booking.DateOut) || booking.DateIn.Equal(booking.DateOut) {
 		return dto.Booking{}, e.NewBadRequestApiError("You should not have a DateIn greater or equal than the DateOut")
+	}
+
+	amadeusID := businessClient.BusinessClient.GetAmadeusIDByHotelID(booking.HotelID)
+	if amadeusID == "" {
+		return dto.Booking{}, e.NewNotFoundApiError("Hotel not found!")
+	}
+
+	available, err := businessClient.BusinessClient.GetAmadeusAvailability(amadeusID, booking.DateIn, booking.DateOut)
+	if err != nil {
+		return dto.Booking{}, err
+	}
+
+	if available == false {
+		return dto.Booking{}, e.NewNotFoundApiError("Hotel not available!")
 	}
 
 	booking = bookingClient.BookingClient.InsertBooking(booking)
@@ -83,7 +89,6 @@ func (s *bookingService) GetBookingById(booking_id uuid.UUID) (dto.Booking, e.Ap
 	bookingDto := dto.Booking{
 		BookingID: booking.BookingID,
 		Total:     booking.Total,
-		Rooms:     booking.Rooms,
 		UserID:    booking.UserID,
 		HotelID:   booking.HotelID,
 		DateIn:    booking.DateIn,
@@ -106,7 +111,6 @@ func (s *bookingService) GetBookings() (dto.Bookings, e.ApiError) {
 		var bookingDto dto.Booking
 		bookingDto.BookingID = booking.BookingID
 		bookingDto.UserID = booking.UserID
-		bookingDto.Rooms = booking.Rooms
 		bookingDto.Total = booking.Total
 		bookingDto.DateIn = booking.DateIn
 		bookingDto.DateOut = booking.DateOut
@@ -133,7 +137,6 @@ func (s *bookingService) GetBookingsByUserId(id uuid.UUID) (dto.Bookings, e.ApiE
 		var bookingDto dto.Booking
 		bookingDto.BookingID = booking.BookingID
 		bookingDto.UserID = booking.UserID
-		bookingDto.Rooms = booking.Rooms
 		bookingDto.Total = booking.Total
 		bookingDto.DateIn = booking.DateIn
 		bookingDto.DateOut = booking.DateOut
@@ -164,7 +167,6 @@ func (s *bookingService) SearchBookings(hotel string, user string, dateIn time.T
 		var bookingDto dto.Booking
 		bookingDto.BookingID = booking.BookingID
 		bookingDto.UserID = booking.UserID
-		bookingDto.Rooms = booking.Rooms
 		bookingDto.Total = booking.Total
 		bookingDto.DateIn = booking.DateIn
 		bookingDto.DateOut = booking.DateOut
@@ -199,7 +201,6 @@ func (s *bookingService) SetActiveBooking(bookingDto dto.Booking) (dto.Booking, 
 		BookingID: bookingDto.BookingID,
 		HotelID:   bookingDto.HotelID,
 		UserID:    bookingDto.UserID,
-		Rooms:     bookingDto.Rooms,
 		Total:     bookingDto.Total,
 		DateIn:    bookingDto.DateIn,
 		DateOut:   bookingDto.DateOut,
