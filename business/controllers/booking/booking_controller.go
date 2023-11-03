@@ -138,7 +138,7 @@ func SearchBookings(c *gin.Context) {
 }
 
 func GetBookingById(c *gin.Context) {
-
+	
 }
 
 func SetActiveBooking(c *gin.Context) {
