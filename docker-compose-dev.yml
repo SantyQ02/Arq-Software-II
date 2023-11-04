@@ -1,0 +1,155 @@
+version: '3.8'
+services:
+  hotels:
+    container_name: hotels_service_dev
+    restart: always
+    build:
+      context: ./hotels
+      dockerfile: Dockerfile.dev
+    command: go run main.go
+    ports:
+      - 8095:8080
+    depends_on:
+      - mongodb
+      - solr
+      - queue
+    volumes:
+      - ./go/hotels:/go/pkg/mod
+      - ./hotels:/api
+      - ./hotels/static:/api/static
+    networks:
+      - app-network
+
+  search:
+    container_name: search_service_dev
+    restart: always
+    build:
+      context: ./search
+      dockerfile: Dockerfile.dev
+    command: go run main.go
+    ports:
+      - 8096:8080
+    depends_on:
+      - queue
+    volumes:
+      - ./go/search:/go/pkg/mod
+      - ./search:/api
+    networks:
+      - app-network
+
+  business:
+    container_name: business_service_dev
+    restart: always
+    build:
+      context: ./business
+      dockerfile: Dockerfile.dev
+    command: go run main.go
+    ports:
+      - 8097:8080
+    depends_on:
+      - db_business
+      - memcached
+    volumes:
+      - ./go/business:/go/pkg/mod
+      - ./business:/api
+    environment:
+      - MYSQL_DB_NAME=db_business
+      - MYSQL_DB_USER=root
+      - MYSQL_DB_PASS=root
+      - MYSQL_DB_HOST=db_business
+      - MYSQL_DB_PORT=3306
+      - AMADEUS_API_KEY=GTGaWwpNKsUwpQG4v4Q9PVZr3n69PCio
+      - AMADEUS_API_SECRET=8ynGLNxs9Gl63GYQ
+      - QUERY_KEY=Edsf489545
+    networks:
+      - app-network
+
+  frontend:
+    container_name: hotels_frontend_dev
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    command: npm run dev
+    ports:
+      - 3003:3000
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    networks:
+      - app-network
+
+  db_business:
+    image: mysql
+    container_name: db_business
+    restart: always
+    environment:
+      MYSQL_DATABASE: db_business
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3307:3306
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - app-network
+
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27018:27017
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes:
+      - mongodata:/data/db
+    networks:
+      - app-network
+
+  memcached:
+    image: memcached:1.6.16
+    container_name: memcached
+    restart: always
+    ports: 
+      - 11211:11211
+    networks:
+      - app-network 
+    
+  queue:
+    image: rabbitmq:3-management
+    container_name: queue
+    restart: always
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    networks:
+      - app-network
+
+  solr:
+    image: solr
+    container_name: solr
+    restart: always
+    ports: 
+      - 8983:8983
+    entrypoint:
+      - bash
+      - "-c"
+      - "mkdir /var/solr/data; precreate-core hotels; precreate-core hotels_test; exec solr -f"
+    volumes:
+      - solrdata:/var/solr
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+  mongodata:
+  solrdata:
+  frontend_node_modules:
