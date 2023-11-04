@@ -8,6 +8,7 @@ import (
 	// "sync"
 	"time"
 	// "github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 type searchService struct{}
@@ -63,7 +64,8 @@ func (s *searchService) Search(city string, checkInDate time.Time, checkOutDate 
 	for _ = range hotels {
 		err := <-errCh
 		if err != nil {
-			return []dto.Hotel{}, e.NewInternalServerApiError("Something went wrong checking availability", err)
+			log.Error(err.Error())
+			// return []dto.Hotel{}, e.NewInternalServerApiError("Something went wrong checking availability", err)
 		}
 	}
 
