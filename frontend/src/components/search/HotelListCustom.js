@@ -71,6 +71,13 @@ export default function HotelsList({ hotels }) {
                                                     Book
                                                 </button>
                                                 </Link>
+                                                <Link href={`admin/hotels/${hotel.hotel_id}`}>
+                                                <button
+                                                    className="inline-block rounded-md border border-transparent bg-indigo-600 px-3 md:px-8 py-1 md:py-3 text-center font-medium text-white hover:bg-indigo-700"
+                                                >
+                                                    ADMIN
+                                                </button>
+                                                </Link>
                                             </div>
                                         </li>
 

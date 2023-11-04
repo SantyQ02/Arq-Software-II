@@ -2,23 +2,28 @@ import { alert } from "../utils/alert";
 const { default: axios } = require("axios");
 import Cookies from "js-cookie";
 
-export async function createHotel(title, description, price_per_day, rooms) {
+export async function createHotel(amadeus_id, title,city_code, description, price_per_day, amenities) {
 
-    rooms = parseInt(rooms)
     price_per_day = parseFloat(price_per_day)
 
+    const token = Cookies.get("token")
+
     const config = {
+        
+        withCredentials: true,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${token}`, 
         },
-        withCredentials: true
     };
 
     const body = JSON.stringify({
+        amadeus_id,
         title,
+        city_code,
         description,
         price_per_day,
-        rooms
+        amenities
     });
 
     try {
@@ -281,7 +286,7 @@ export async function getAvailableHotels(rooms, date_in, date_out){
 
 export async function getHotelById(id){
     try {
-        const res = await axios.get(`http://localhost:3000/api/hotel/${id}`, { withCredentials: true })
+        const res = await axios.get(`http://localhost:${process.env.PORT}/api/hotel/${id}`, { withCredentials: true })
         if (res.status === 200) {
             return res.data.hotel
         }

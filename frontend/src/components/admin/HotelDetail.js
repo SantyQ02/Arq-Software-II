@@ -23,6 +23,7 @@ import { HeartIcon, MinusSmIcon, PlusSmIcon, TrashIcon } from '@heroicons/react/
 import { useContext, useEffect } from "react"
 import Image from 'next/image';
 import { dissociateAmenities } from '@/lib/api/hotel';
+import { useRouter } from 'next/router';
 
 
 function classNames(...classes) {
@@ -31,12 +32,14 @@ function classNames(...classes) {
 
 export default function HotelDetail({ hotel, setHotel }) {
 
+  const router = useRouter()
+
   const get_hotel_by_id = async () => {
 
     const updatedHotel = await getHotelById(hotel.hotel_id)
-    const data = await getAmenities()
+    // const data = await getAmenities()
     const filtered_data = data?.filter(amenity => !updatedHotel.amenities?.some(hotelAmenity => hotelAmenity.amenitie_id === amenity.amenitie_id));
-    setAmenities(filtered_data)
+    // setAmenities(filtered_data)
     setHotel(updatedHotel)
   }
 
@@ -51,9 +54,9 @@ export default function HotelDetail({ hotel, setHotel }) {
   }
 
   // const [change, setChange] = useState(false)
-  useEffect(() => {
-    get_amenities()
-  }, [])
+  // useEffect(() => {
+  //   get_amenities()
+  // }, [])
 
   //Add amenity
   const handleAddAmenity = async amenity_id => {
@@ -108,7 +111,7 @@ export default function HotelDetail({ hotel, setHotel }) {
     }
     setFile(null)
 
-    get_hotel_by_id()
+    router.reload()
   };
   // end add file
 
@@ -116,7 +119,7 @@ export default function HotelDetail({ hotel, setHotel }) {
   const handleDeletePhoto = async (e, photo_id) => {
     e.preventDefault()
     await deletePhoto(photo_id)
-    get_hotel_by_id()
+    router.reload()
 
   }
   //end delete photo
@@ -167,15 +170,16 @@ export default function HotelDetail({ hotel, setHotel }) {
                     className="relative h-24 bg-white rounded-md flex items-center justify-center text-sm font-medium uppercase text-gray-900 cursor-pointer hover:bg-gray-50 focus:outline-none focus:ring focus:ring-offset-4 focus:ring-opacity-50"
                   >
                     {({ selected }) => (
-                      <>
+                      <div>
                         <span className="absolute inset-0 rounded-md overflow-hidden">
                           <Image src={`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/public/${photo.url}`} alt="" className="w-full h-full object-center object-cover" width={1000} height={1000}/>
                         </span>
-                        <button className='z-50 absolute end-0 top-0'
-                          onClick={e => handleDeletePhoto(e, photo.photo_id)}>
+                        <div className='z-50 absolute end-0 top-0'
+                          onClick={e => handleDeletePhoto(e, photo.photo_id)}
+                          >
 
                           <TrashIcon className='h-7 w-7 text-red-400' />
-                        </button>
+                        </div>
                         <span
                           className={classNames(
                             selected ? 'ring-indigo-500' : 'ring-transparent',
@@ -183,7 +187,7 @@ export default function HotelDetail({ hotel, setHotel }) {
                           )}
                           aria-hidden="true"
                         />
-                      </>
+                      </div>
                     )}
                   </Tab>
                 ))}

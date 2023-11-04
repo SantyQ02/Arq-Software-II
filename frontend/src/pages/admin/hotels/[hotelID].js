@@ -7,24 +7,25 @@ import { useRouter } from "next/router"
 import { useContext, useEffect } from "react"
 import { useState } from "react";
 
-const DashboardHotelsDetail = () => {
+export async function getServerSideProps({query}){
+  const _hotel = await getHotelById(query.hotelID)
+  return {
+    props:{
+      _hotel
+    }
+  }
+}
+
+export default function DashboardHotelsDetail({_hotel}){
   const [user, setUser] = useContext(UserContext);
   const router = useRouter()
-  const hotel_id = router.query.hotelID
-  const [hotel, setHotel] = useState(null)
+  const [hotel, setHotel] = useState(_hotel)
 
-  useEffect(() => {
+  // useEffect(()=>{
+  //   if (user === null || user.role !== "admin")
+  //     router.push("/auth/login")
+  // },[user])
 
-    // if (user === null || user.role !== "admin")
-    //   router.push("/auth/login")
-    
-    const get_hotel_by_id = async () => {
-      const data = await getHotelById('47495bc9-e838-4731-8d0f-1ee8a1faf65a')
-      setHotel(data)
-    }
-    get_hotel_by_id()
-    
-  }, [])
   return (
     <DashboardAdmin title={"Hotels Detail"} current={"/admin/hotels"}>
 
@@ -35,5 +36,3 @@ const DashboardHotelsDetail = () => {
     </DashboardAdmin>
   )
 }
-
-export default DashboardHotelsDetail

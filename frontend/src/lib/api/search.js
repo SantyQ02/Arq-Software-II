@@ -3,7 +3,7 @@ import axios from "axios";
 export async function search_hotels(city_code, check_in_date, check_out_date) {
 
     try {
-        const res = await axios.get(`http://localhost:3000/api/search?city_code=${city_code}&check_in_date=${check_in_date}&check_out_date=${check_out_date}`)
+        const res = await axios.get(`http://localhost:${process.env.PORT}/api/search?city_code=${city_code}&check_in_date=${check_in_date}&check_out_date=${check_out_date}`)
         if (res.status != 200) {
             return []
         }

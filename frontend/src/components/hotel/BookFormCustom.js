@@ -5,10 +5,12 @@ import { useContext } from 'react';
 import { UserContext } from '../../layouts/LayoutContext';
 import { checkAvailability } from "@/lib/api/hotel";
 import { useRouter } from "next/router";
+import { Oval } from "react-loader-spinner";
 
 const BookForm = ({ hotel, setDataCheck }) => {
 
     const [available, setAvailable] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     const [user, setUser] = useContext(UserContext);
     const router = useRouter()
@@ -59,8 +61,9 @@ const BookForm = ({ hotel, setDataCheck }) => {
     }
 
     const handleSubmit = e => {
+        setIsLoading(true)
         const start_date = dates.startDate !== null ? new Date(dates.startDate).toISOString() : ""
-            const end_date = dates.startDate !== null ? new Date(dates.endDate).toISOString() : ""
+        const end_date = dates.startDate !== null ? new Date(dates.endDate).toISOString() : ""
 
         e.preventDefault()
         if (user === null) {
@@ -69,7 +72,7 @@ const BookForm = ({ hotel, setDataCheck }) => {
                 total,
                 start_date,
                 end_date,
-                hotel_id:hotel.hotel_id,
+                hotel_id: hotel.hotel_id,
                 user,
                 hotel_title: hotel.title
             }
@@ -80,22 +83,24 @@ const BookForm = ({ hotel, setDataCheck }) => {
         }
         const create_booking = async () => {
             const success = await createBooking(rooms, total, start_date, end_date, hotel.hotel_id, user.user_id)
+            setIsLoading(false)
             // //console.log("\nrooms: ",rooms,"\ntotal: ", total,"\ndate_in: ", dates.startDate,"\ndate_out: ", dates.endDate,"\nhotel_id: ", hotel.hotel_id,"\nuser_id: ", user.user_id)
-            router.push(`/confirmation/${success ? 'success' : 'error'}`); 
+            router.push(`/confirmation/${success ? 'success' : 'error'}`);
         }
 
         create_booking()
+        
     }
 
     // set data to check availability to parent component
-    useEffect(()=>{
+    useEffect(() => {
         setDataCheck({
             rooms: rooms,
             date_in: dates.startDate !== null ? new Date(dates.startDate).toISOString() : "",
             date_out: dates.startDate !== null ? new Date(dates.endDate).toISOString() : "",
             currentHotelId: hotel.hotel_id
         })
-    },[dates, rooms])
+    }, [dates, rooms])
 
     return (
         <form onSubmit={e => handleSubmit(e)}>
@@ -121,26 +126,38 @@ const BookForm = ({ hotel, setDataCheck }) => {
 
             </div>
             {total !== null &&
-                <p className="text-2xl text-gray-900">Total: $ {total}</p>
+                <p className="text-2xl text-gray-900">Total: $ {total.toFixed(2)}</p>
             }
 
             {
                 available ?
                     <>
-                        {user != null ?
+                        {isLoading ?
                             <button
-                                type="submit"
                                 className="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                             >
-                                Book Now!
+                                <Oval
+                                    type="Oval"
+                                    color="#fff"
+                                    width={20}
+                                    height={20}
+                                />
                             </button>
                             :
-                            <button
-                                type="submit"
-                                className="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                            >
-                                Sign In & Book Now!
-                            </button>
+                            user != null ?
+                                <button
+                                    type="submit"
+                                    className="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                >
+                                    Book Now!
+                                </button>
+                                :
+                                <button
+                                    type="submit"
+                                    className="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                >
+                                    Sign In & Book Now!
+                                </button>
                         }
                     </>
 

@@ -14,7 +14,7 @@ const DashboardHotelsDetail = () => {
   const [hotel, setHotel] = useState(null)
 
   useEffect(() => {
-
+    
     if (user === null || user.role !== "admin")
       router.push("/auth/login")
     
