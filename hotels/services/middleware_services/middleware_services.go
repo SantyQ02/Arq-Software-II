@@ -7,6 +7,7 @@ import (
 	// "bytes"
 
 	"github.com/gin-gonic/gin"
+	"fmt"
 )
 
 type middlewareService struct{}
@@ -65,7 +66,7 @@ func (m *middlewareService) CheckAdmin() gin.HandlerFunc {
 		}
 
 		// r.Header.Add("Content-Type", "application/json")
-		r.Header.Add("Authorization", authorizationHeader)
+		r.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
 
 		client := &http.Client{}
 		res, err := client.Do(r)
