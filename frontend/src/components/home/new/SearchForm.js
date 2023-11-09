@@ -32,7 +32,10 @@ const SearchForm = ({ className = "", city_code = "", check_in_date = null, chec
         setLoading(true)
         const { startDate, endDate } = dates
         router.push(`/search?city_code=${city}&check_in_date=${startDate}&check_out_date=${endDate}`)
-        // setLoading(false)
+        if (router.asPath == `/search?city_code=${city}&check_in_date=${dates.startDate}&check_out_date=${dates.endDate}`){
+
+            setLoading(false)
+        }
     }
 
     return (
