@@ -43,6 +43,15 @@ services:
       - memcached
     volumes:
       - business_go_modules:/go/pkg/mod
+    environment:
+      - MYSQL_DB_NAME=db_business
+      - MYSQL_DB_USER=root
+      - MYSQL_DB_PASS=root
+      - MYSQL_DB_HOST=db_business
+      - MYSQL_DB_PORT=3306
+      - AMADEUS_API_KEY=GTGaWwpNKsUwpQG4v4Q9PVZr3n69PCio
+      - AMADEUS_API_SECRET=8ynGLNxs9Gl63GYQ
+      - QUERY_KEY=Edsf489545
     networks:
       - app-network
 
@@ -114,6 +123,12 @@ services:
     restart: always
     ports: 
       - 8983:8983
+    entrypoint:
+      - bash
+      - "-c"
+      - "mkdir /var/solr/data; precreate-core hotels; precreate-core hotels_test; exec solr -f"
+    volumes:
+      - solrdata:/var/solr
     networks:
       - app-network
 
@@ -128,4 +143,5 @@ volumes:
   search_go_modules:
   business_go_modules:
   frontend_node_modules:
+  solrdata:
   public:

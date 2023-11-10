@@ -80,7 +80,7 @@ export default function SuggestedHotels({ dataCheck, setHotel }) {
             <div key={hotel.hotel_id} className="group relative">
               <div className="w-full h-96 rounded-lg overflow-hidden group-hover:opacity-75 sm:h-auto sm:aspect-w-2 sm:aspect-h-3">
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_URL_API}/api/public/${hotel.photos !== null ? hotel.photos[0].url : "missing_hotel.png"}`}
+                  src={`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/public/${hotel.photos !== null ? hotel.photos[0].url : "missing_hotel.png"}`}
                   alt={hotel.title}
                   className="w-full object-center object-cover h-32"
                   width={1000} height={1000}

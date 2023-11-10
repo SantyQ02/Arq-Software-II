@@ -2,7 +2,7 @@
 
 export default async function handler(req, res) {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api/auth/register`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVICE_BUSINESS}/api/auth/register`, {
         method: 'POST',
         body: JSON.stringify(req.body), 
         headers: req.headers.JSON

@@ -1,8 +1,7 @@
 export default async function handler(req, res) {
     try {
         const { userID } = req.query;
-        //   const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api/hotel`, {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api/user/${userID}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVICE_BUSINESS}/api/user/${userID}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

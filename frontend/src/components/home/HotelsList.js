@@ -88,7 +88,7 @@ export default function HotelsList({ hotels }) {
                                         <li key={hotelIdx} className="flex py-6 sm:py-10">
                                             <div className="flex-shrink-0">
                                                 <Image
-                                                    src={`${process.env.NEXT_PUBLIC_URL_API}/api/public/${hotel.photos != null ? hotel.photos[0].url : "missing_hotel.png"}`}
+                                                    src={`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/public/${hotel.photos != null ? hotel.photos[0].url : "missing_hotel.png"}`}
                                                     alt={hotel.title}
                                                     width={1000}
                                                     height={1000}
