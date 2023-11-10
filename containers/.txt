@@ -1,0 +1,2 @@
+para ver los stats de las instancias de search
+docker ps --filter label=com.docker.compose.service=search --format "{{.ID}}" | awk '{print $1}' | xargs docker stats
