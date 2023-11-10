@@ -4,6 +4,8 @@ services:
     restart: always
     build:
       context: ./hotels
+    deploy:
+      replicas: 2
     expose:
       - "8080"
     depends_on:
@@ -20,6 +22,8 @@ services:
     restart: always
     build:
       context: ./search
+    deploy:
+      replicas: 2
     expose:
       - "8080"
     depends_on:
@@ -33,6 +37,8 @@ services:
     restart: always
     build:
       context: ./business
+    deploy:
+      replicas: 2
     expose:
       - "8080"
     depends_on:
@@ -55,6 +61,8 @@ services:
   frontend:
     build:
       context: ./frontend
+    deploy:
+      replicas: 2
     expose:
       - "3000"
     volumes:
