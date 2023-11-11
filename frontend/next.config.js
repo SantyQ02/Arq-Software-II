@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: [process.env.NEXT_PUBLIC_DOMAIN_API, "static.independent.co.uk", "images.bubbleup.com", "hotels"],
+    domains: [process.env.NEXT_PUBLIC_DOMAIN_API, "static.independent.co.uk", "images.bubbleup.com", "hotels", "nginx_hotels"],
   },
 
   // Configuración para servir archivos estáticos desde la carpeta public

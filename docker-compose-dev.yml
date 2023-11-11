@@ -1,14 +1,16 @@
 version: '3.8'
+name: microservices
 services:
   hotels:
-    container_name: hotels_service_dev
     restart: always
     build:
       context: ./hotels
       dockerfile: Dockerfile.dev
     command: go run main.go
-    ports:
-      - 8095:8080
+    deploy:
+      replicas: 2
+    expose:
+      - "8080"
     depends_on:
       - mongodb
       - solr
@@ -21,14 +23,15 @@ services:
       - app-network
 
   search:
-    container_name: search_service_dev
     restart: always
     build:
       context: ./search
       dockerfile: Dockerfile.dev
     command: go run main.go
-    ports:
-      - 8096:8080
+    deploy:
+      replicas: 2
+    expose:
+      - "8080"
     depends_on:
       - queue
     volumes:
@@ -38,14 +41,15 @@ services:
       - app-network
 
   business:
-    container_name: business_service_dev
     restart: always
     build:
       context: ./business
       dockerfile: Dockerfile.dev
     command: go run main.go
-    ports:
-      - 8097:8080
+    deploy:
+      replicas: 2
+    expose:
+      - "8080"
     depends_on:
       - db_business
       - memcached
@@ -65,13 +69,14 @@ services:
       - app-network
 
   frontend:
-    container_name: hotels_frontend_dev
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
     command: npm run dev
-    ports:
-      - 3003:3000
+    deploy:
+      replicas: 2
+    expose:
+      - "3000"
     volumes:
       - ./frontend:/app
       - frontend_node_modules:/app/node_modules
@@ -141,6 +146,50 @@ services:
       - "mkdir /var/solr/data; precreate-core hotels; precreate-core hotels_test; exec solr -f"
     volumes:
       - solrdata:/var/solr
+    networks:
+      - app-network
+
+  nginx_frontend:
+    image: nginx:latest
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+    ports:
+      - "81:80"
+    networks:
+      - app-network
+
+  nginx_hotels:
+    image: nginx:latest
+    volumes:
+      - ./hotels/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - hotels
+    ports:
+      - "82:80"
+    networks:
+      - app-network
+
+  nginx_search:
+    image: nginx:latest
+    volumes:
+      - ./search/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - search
+    ports:
+      - "83:80"
+    networks:
+      - app-network
+
+  nginx_business:
+    image: nginx:latest
+    volumes:
+      - ./business/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - business
+    ports:
+      - "84:80"
     networks:
       - app-network
 
