@@ -51,3 +51,16 @@ func DeleteContainer(c *gin.Context) {
 
 }
 
+func RestartContainer(c *gin.Context) {
+
+	container_id := c.Param("container_id")
+
+	er := service.ContainersService.RestartContainer(container_id)
+	if er != nil {
+		c.JSON(er.Status(), gin.H{"error": er.Message()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Container restarted successfully"})
+
+}

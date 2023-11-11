@@ -2,13 +2,13 @@
 
 nombre_servicio=$1
 
-# Obtener IDs de contenedores del servicio
-container_ids=$(docker-compose -f ../docker-compose-dev.yml ps -q $nombre_servicio)
-
 if ! docker-compose -f ../docker-compose-dev.yml config --services | grep -qw "$nombre_servicio"; then
     echo "El servicio $nombre_servicio no existe en el archivo de configuración."
     exit 1
 fi
+
+# Obtener IDs de contenedores del servicio
+container_ids=$(docker-compose -f ../docker-compose-dev.yml ps -q $nombre_servicio)
 
 # Verificar si hay contenedores para el servicio
 if [ -z "$container_ids" ]; then

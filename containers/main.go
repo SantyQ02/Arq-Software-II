@@ -2,10 +2,12 @@ package main
 
 import (
 	"containers/app"
-	"containers/utils"
+	"containers/service"
+	"containers/docker"
 )
 
 func main() {
-	go utils.AutoScaling()
+	docker.StartDockerClient()
+	go service.AutoScaling("search")
 	app.StartRoute()
 }
