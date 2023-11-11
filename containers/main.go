@@ -8,6 +8,6 @@ import (
 
 func main() {
 	docker.StartDockerClient()
-	go service.AutoScaling("search")
+	go service.AutoScaling("frontend")
 	app.StartRoute()
 }

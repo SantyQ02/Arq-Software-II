@@ -81,7 +81,6 @@ func (s *containersService) RestartContainer(container_id string)(e.ApiError) {
 
 func AutoScaling(service_auto_scaling string){
 	for {
-		time.Sleep(20 * time.Second)
 
 		containers_stats, err := client.ContainersClient.GetContainersStatsByService(service_auto_scaling)
 
@@ -96,7 +95,7 @@ func AutoScaling(service_auto_scaling string){
             log.Error("Error parsing CPU usage: ", err)
             return
         }
-        if cpu > 5 {
+        if cpu > 50 {
 			log.Warning("CPU Usage: ", cpu)
             err = client.ContainersClient.CreateContainer(service_auto_scaling, uint(instances) + uint(1))
 			if err != nil {
@@ -107,7 +106,7 @@ func AutoScaling(service_auto_scaling string){
 
             log.Info("New instance of search service was created. Total: ", instances+1)
         }
-		if cpu < 2.5 && instances > 2 {
+		if cpu < 10 && instances > 2 {
 			var container_id = containers_stats.ContainersStats[instances - 1].ContainerID
 			err := client.ContainersClient.DeleteContainer(container_id)
 			if err != nil {
@@ -118,5 +117,7 @@ func AutoScaling(service_auto_scaling string){
 
             log.Info("An instance of search service was deleted. Total: ", instances - 1)
 		}
+
+		time.Sleep(15 * time.Second)
     }
 }

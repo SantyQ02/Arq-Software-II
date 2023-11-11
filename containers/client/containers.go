@@ -5,6 +5,7 @@ import (
 	"strings"
 	"fmt"
 	"context"
+	"os"
 	"os/exec"
 
 	"github.com/docker/docker/api/types/container"
@@ -34,7 +35,7 @@ func init() {
 
 func (c *containersClient) GetContainersStats()(dto.ContainersStats, error) {
 
-	containerIDsCmd := exec.Command("docker-compose", "-f", "../docker-compose-dev.yml", "ps", "-q")
+	containerIDsCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "ps", "-q")
 	containerIDsOutput, err := containerIDsCmd.Output()
 	if err != nil {
 		log.Error("aca 1")
@@ -55,7 +56,7 @@ func (c *containersClient) GetContainersStats()(dto.ContainersStats, error) {
 
 func (c *containersClient) GetContainersStatsByService(service string)(dto.ContainersStats, error) {
 
-	serviceExistsCmd := exec.Command("docker-compose", "-f", "../docker-compose-dev.yml", "config", "--services")
+	serviceExistsCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "config", "--services")
     serviceExistsOutput, err := serviceExistsCmd.Output()
     if err != nil {
         log.Error(err.Error())
@@ -66,7 +67,7 @@ func (c *containersClient) GetContainersStatsByService(service string)(dto.Conta
         return dto.ContainersStats{}, errors.New(fmt.Sprintf("Service with name: '%s' does not exist", service))
     }
 
-    containerIDsCmd := exec.Command("docker-compose", "-f", "../docker-compose-dev.yml", "ps", "-q", service)
+    containerIDsCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "ps", "-q", service)
     containerIDsOutput, err := containerIDsCmd.Output()
     if err != nil {
         log.Error(err.Error())
@@ -94,7 +95,7 @@ func (c *containersClient) GetContainersStatsByService(service string)(dto.Conta
 
 func (c *containersClient) CreateContainer(service string, quantity uint)(error) {
 
-	serviceExistsCmd := exec.Command("docker-compose", "-f", "../docker-compose-dev.yml", "config", "--services")
+	serviceExistsCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "config", "--services")
     serviceExistsOutput, err := serviceExistsCmd.Output()
     if err != nil {
         log.Error("Error while searching the service name")
@@ -105,12 +106,12 @@ func (c *containersClient) CreateContainer(service string, quantity uint)(error)
         return errors.New(fmt.Sprintf("Service with name: '%s' does not exist", service))
     }
 
-	createServicecmd := exec.Command("docker-compose", "-f", "../docker-compose-dev.yml", "up", "--scale", fmt.Sprintf("%s=%d", service, quantity), "-d")
+	createServicecmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "up", "--scale", fmt.Sprintf("%s=%d", service, quantity), "-d")
 	if err := createServicecmd.Run(); err != nil {
 		log.Error("Error while creating a container")
 	}
 
-	restartServiceCmd := exec.Command("docker-compose", "-f", "../docker-compose-dev.yml", "restart", fmt.Sprintf("nginx_%s", service))
+	restartServiceCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "restart", fmt.Sprintf("nginx_%s", service))
 	if err := restartServiceCmd.Run(); err != nil {
 		log.Error("Error while restarting nginx")
 	}
@@ -132,7 +133,7 @@ func (c *containersClient) DeleteContainer(container_id string)(error) {
 		log.Error("Error while deleting the container")
 	}
 
-	restartServiceCmd := exec.Command("docker-compose", "-f", "../docker-compose-dev.yml", "restart", fmt.Sprintf("nginx_%s", serviceName))
+	restartServiceCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "restart", fmt.Sprintf("nginx_%s", serviceName))
 	if err := restartServiceCmd.Run(); err != nil {
 		log.Error("Error while restarting nginx")
 	}
