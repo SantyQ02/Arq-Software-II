@@ -96,26 +96,26 @@ func AutoScaling(service_auto_scaling string){
             return
         }
         if cpu > 50 {
-			log.Warning("CPU Usage: ", cpu)
+			log.Warning(fmt.Sprintf("%s: CPU Usage: ", service_auto_scaling), cpu)
             err = client.ContainersClient.CreateContainer(service_auto_scaling, uint(instances) + uint(1))
 			if err != nil {
-				log.Error("Error while creating a new instance of search service")
+				log.Error(fmt.Sprintf("Error while creating a new instance of %s service", service_auto_scaling))
 				time.Sleep(2 * time.Second)
 				continue
 			}
 
-            log.Info("New instance of search service was created. Total: ", instances+1)
+            log.Info(fmt.Sprintf("New instance of %s service was created. Total: ", service_auto_scaling), instances+1)
         }
 		if cpu < 10 && instances > 2 {
 			var container_id = containers_stats.ContainersStats[instances - 1].ContainerID
 			err := client.ContainersClient.DeleteContainer(container_id)
 			if err != nil {
-				log.Error("Error while deleting as instance of search service")
+				log.Error(fmt.Sprintf("Error while deleting as instance of %s service", service_auto_scaling))
 				time.Sleep(2 * time.Second)
 				continue
 			}
 
-            log.Info("An instance of search service was deleted. Total: ", instances - 1)
+            log.Info(fmt.Sprintf("An instance of %s service was deleted. Total: ", service_auto_scaling), instances - 1)
 		}
 
 		time.Sleep(15 * time.Second)
