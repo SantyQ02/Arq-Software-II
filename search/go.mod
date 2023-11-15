@@ -8,6 +8,7 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/joho/godotenv v1.5.1
 	github.com/json-iterator/go v1.1.12
+	github.com/karlseguin/ccache/v3 v3.0.5
 	github.com/rabbitmq/amqp091-go v1.9.0
 	github.com/rtt/Go-Solr v0.0.0-20190512221613-64fac99dcae2
 	github.com/sirupsen/logrus v1.9.3
