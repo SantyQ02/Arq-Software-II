@@ -23,8 +23,8 @@ func TestCheckAvailability(t *testing.T) {
 	initTestClient()
 	mockClient := businessClient.BusinessClient.(*businessClient.BusinessMockClient)
 	hotelID := uuid.New()
-	checkInDate := time.Now()
-	checkOutDate := checkInDate.Add(24 * time.Hour)
+	checkInDate := time.Now().UTC()
+	checkOutDate := checkInDate.Add(24 * time.Hour).UTC()
 
 	mockClient.On("GetAmadeusIDByHotelID", hotelID).Return("amadeus123")
 	mockClient.On("GetAmadeusAvailability", "amadeus123", checkInDate, checkOutDate).Return(true, nil)
@@ -39,8 +39,8 @@ func TestCheckAvailabilityErrorHotelNotFound(t *testing.T) {
 	initTestClient()
 	mockClient := businessClient.BusinessClient.(*businessClient.BusinessMockClient)
 	hotelID := uuid.New()
-	checkInDate := time.Now()
-	checkOutDate := checkInDate.Add(24 * time.Hour)
+	checkInDate := time.Now().UTC()
+	checkOutDate := checkInDate.Add(24 * time.Hour).UTC()
 
 	mockClient.On("GetAmadeusIDByHotelID", hotelID).Return("")
 
@@ -56,8 +56,8 @@ func TestCheckAvailabilityErrorAmadeusAPI(t *testing.T) {
 	initTestClient()
 	mockClient := businessClient.BusinessClient.(*businessClient.BusinessMockClient)
 	hotelID := uuid.New()
-	checkInDate := time.Now()
-	checkOutDate := checkInDate.Add(24 * time.Hour)
+	checkInDate := time.Now().UTC()
+	checkOutDate := checkInDate.Add(24 * time.Hour).UTC()
 
 	mockClient.On("GetAmadeusIDByHotelID", hotelID).Return("amadeus123")
 	mockClient.On("GetAmadeusAvailability", "amadeus123", checkInDate, checkOutDate).Return(false, "Amadeus API Error")

@@ -20,12 +20,13 @@ func (s *BusinessMockClient) InsertHotelMapping(hotelMapping model.HotelMapping)
 
 func (s *BusinessMockClient) GetAmadeusIDByHotelID(hotelID uuid.UUID) string {
 	ret := s.Called(hotelID)
-	return ret.Get(0).(model.HotelMapping).AmadeusID
+	return ret.String(0)
 }
 
 func (s *BusinessMockClient) GetAmadeusAvailability(amadeusID string, checkInDate time.Time, checkOutDate time.Time) (bool, e.ApiError) {
 	ret := s.Called(amadeusID, checkInDate, checkOutDate)
-	return ret.Get(0).(AvailabilityResponse).Data[0].Available, nil
+	    if ret.Get(1) == nil {
+        return ret.Bool(0),nil
+    }
+    return ret.Bool(0), ret.Get(1).(e.ApiError)
 }
-
-//func getAmadeusToken() {}

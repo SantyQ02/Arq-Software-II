@@ -5,8 +5,8 @@ import (
 )
 
 type HotelMapping struct {
-	HotelID   uuid.UUID `json:"hotel_id"`
-	AmadeusID string    `json:"amadeus_id"`
+	HotelID   uuid.UUID `json:"hotel_id" binding:"required"`
+	AmadeusID string    `json:"amadeus_id" binding:"required"`
 }
 
 type HotelMappings []HotelMapping

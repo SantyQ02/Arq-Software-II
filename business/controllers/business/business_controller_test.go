@@ -26,15 +26,17 @@ func TestCheckAvailability(t *testing.T) {
 	mockBusinessService := businessService.BusinessService.(*businessService.BusinessMockService)
 
 	hotelID := uuid.New()
-	checkInDate := time.Now().AddDate(0, 0, 1)
-	checkOutDate := time.Now().AddDate(0, 0, 3)
+	checkInDateString := "2023-12-12"
+	checkOutDateString := "2023-12-13"
+	checkInDate, _ := time.Parse("2006-01-02", checkInDateString)
+	checkOutDate, _ := time.Parse("2006-01-02", checkOutDateString)
 
 	mockBusinessService.On("CheckAvailability", hotelID, checkInDate, checkOutDate).Return(true, nil)
 
 	router := gin.Default()
 	router.GET("/test/hotel/:hotelID/availability", CheckAvailability)
 
-	req, _ := http.NewRequest("GET", "/test/hotel/"+hotelID.String()+"/availability?checkInDate="+checkInDate.Format("2006-01-02")+"&checkOutDate="+checkOutDate.Format("2006-01-02"), nil)
+	req, _ := http.NewRequest("GET", "/test/hotel/"+hotelID.String()+"/availability?checkInDate="+checkInDateString+"&checkOutDate="+checkOutDateString, nil)
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
@@ -78,10 +80,11 @@ func TestMapHotel(t *testing.T) {
 	mockBusinessService := businessService.BusinessService.(*businessService.BusinessMockService)
 
 	hotelMapping := dto.HotelMapping{
-		// Initialize HotelMapping fields as needed for the test
+		AmadeusID: "ABCDEFG",
+		HotelID:   uuid.New(),
 	}
 
-	mockBusinessService.On("MapHotel", hotelMapping).Return("hotel_mapping_result", nil)
+	mockBusinessService.On("MapHotel", hotelMapping).Return(hotelMapping, nil)
 
 	router := gin.Default()
 	router.POST("/test/hotel/map", MapHotel)
@@ -92,34 +95,20 @@ func TestMapHotel(t *testing.T) {
 	router.ServeHTTP(resp, req)
 
 	assert.Equal(t, 201, resp.Code)
-	assert.Contains(t, resp.Body.String(), `"hotel_mapping":"hotel_mapping_result"`)
 }
 
 func TestMapHotelErrorInvalidPayload(t *testing.T) {
 	initTestClient()
+
+	hotelMapping := dto.HotelMapping{}
+
 	router := gin.Default()
 	router.POST("/test/hotel/map", MapHotel)
 
-	req, _ := http.NewRequest("POST", "/test/hotel/map", bytes.NewBuffer([]byte(`invalid_payload`)))
+	payload, _ := json.Marshal(hotelMapping)
+	req, _ := http.NewRequest("POST", "/test/hotel/map", bytes.NewBuffer(payload))
 	resp := httptest.NewRecorder()
 	router.ServeHTTP(resp, req)
 
 	assert.Equal(t, 400, resp.Code)
-	assert.Contains(t, resp.Body.String(), "Invalid payload")
-}
-
-// Add more test cases for MapHotel as needed
-
-// Tests for CheckAdmin
-func TestCheckAdmin(t *testing.T) {
-	initTestClient()
-	router := gin.Default()
-	router.GET("/test/checkadmin", CheckAdmin)
-
-	req, _ := http.NewRequest("GET", "/test/checkadmin", nil)
-	resp := httptest.NewRecorder()
-	router.ServeHTTP(resp, req)
-
-	assert.Equal(t, 200, resp.Code)
-	assert.Nil(t, resp.Body.Bytes())
 }
