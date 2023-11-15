@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"mvc-go/client"
 	"mvc-go/dto"
-
-	cacheLocal "mvc-go/cache"
 	e "mvc-go/utils/errors"
 
 	// "sync"
@@ -31,7 +29,7 @@ func init() {
 func (s *searchService) Search(city string, checkInDate time.Time, checkOutDate time.Time) ([]dto.Hotel, e.ApiError) {
 	cacheKey := fmt.Sprintf("%s/%s/%s", city, checkInDate.Format("2006-01-02"), checkOutDate.Format("2006-01-02"))
 
-	hotelsCache := cacheLocal.Get(cacheKey)
+	hotelsCache := client.CacheClient.Get(cacheKey)
 	if hotelsCache != nil {
 		return hotelsCache, nil
 	}
@@ -78,7 +76,7 @@ func (s *searchService) Search(city string, checkInDate time.Time, checkOutDate 
 		}
 	}
 
-	cacheLocal.Set(cacheKey, hotels)
+	client.CacheClient.SetWithExpiration(cacheKey, hotels, 5)
 
 	return hotels, nil
 }
