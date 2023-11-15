@@ -1,7 +1,7 @@
 import { alert } from "../utils/alert";
 const { default: axios } = require("axios");
 
-export async function createBooking(rooms, total, date_in, date_out, hotel_id, user_id) {
+export async function createBooking(rooms, total, date_in, date_out, hotel_id, user_id, hotel_title) {
 
     rooms = parseInt(rooms)
     total = parseFloat(total)
@@ -19,7 +19,8 @@ export async function createBooking(rooms, total, date_in, date_out, hotel_id, u
         date_in,
         date_out,
         hotel_id,
-        user_id
+        user_id,
+        hotel_title
     });
 
     try {

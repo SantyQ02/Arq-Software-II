@@ -109,9 +109,8 @@ func (c *bookingClient) DeleteBooking(id string) error {
 func (c *bookingClient) SearchBookingsByDatesAndHotelAndUser(hotel string, user string, dateIn time.Time, dateOut time.Time) model.Bookings {
 	var bookings model.Bookings
 
-	query := Db.Joins("LEFT JOIN hotels ON hotels.hotel_id = bookings.hotel_id").
-		Joins("LEFT JOIN users ON users.user_id = bookings.user_id").
-		Where(`(('' = ?) OR (bookings.hotel_id LIKE ? OR hotels.title LIKE ?))
+	query := Db.Joins("LEFT JOIN users ON users.user_id = bookings.user_id").
+		Where(`(('' = ?) OR (bookings.hotel_id LIKE ? OR bookings.hotel_title LIKE ?))
 		AND (('' = ?) OR (bookings.user_id LIKE ? OR users.user_name LIKE ?))
 		AND ((date_in >= ? AND date_in <= ?)
 		OR (date_out >= ? AND date_out <= ?)

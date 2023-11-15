@@ -63,9 +63,9 @@ export default function Login() {
     const userMe = await getme()
 
     if (booking != null && userMe != null){
-      const {rooms, total, start_date, end_date, hotel_id} = booking
+      const {rooms, total, start_date, end_date, hotel_id, hotel_title} = booking
       const create_booking = async () => {
-        await createBooking(rooms, total, start_date, end_date, hotel_id, userMe.user_id)
+        await createBooking(rooms, total, start_date, end_date, hotel_id, userMe.user_id, hotel_title)
         // //console.log("\nrooms: ",rooms,"\ntotal: ", total,"\ndate_in: ", start_date,"\ndate_out: ", end_date,"\nhotel_id: ", hotel_id,"\nuser_id: ", userMe.user_id)
         sessionStorage.removeItem('booking');
 
