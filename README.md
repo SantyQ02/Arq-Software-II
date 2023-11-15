@@ -1,6 +1,9 @@
 # Test
 
-    docker-compose up db_business mongodb memcached queue solr
+    docker-compose -f docker-compose-dev.yml up -d
+    cd containers
+    go get -d
+    go run main.go
 
 # Business Testing
 

@@ -10,11 +10,12 @@ const DashboardHotelsCreate = () => {
   const [user, setUser] = useContext(UserContext);  
   const router = useRouter()
 
-  useEffect(()=>{
 
-    if (user === null || user.role !== "admin")
-    router.push("/auth/login")
-  },[])
+  // useEffect(()=>{
+
+  //   if (user === null || user.role !== "admin")
+  //   router.push("/auth/login")
+  // },[])
   return (
       <DashboardAdmin title={"Create Hotel"} current={"/admin/hotels/create"}>
 
