@@ -12,7 +12,6 @@ import { useEffect, useState } from "react"
   
   export default function BookingCard({booking_data, bookings}) {
 
-    const [hotel, setHotel] = useState(null)
     const [user, setUser] = useState(null)
     const [active, setActive] = useState(booking_data.active)
     const [booking, setBooking] = useState(booking_data)
@@ -35,11 +34,6 @@ import { useEffect, useState } from "react"
       setActive(true)
   }
 
-    const get_hotel_by_id = async (booking_d) => {
-      const data = await getHotelById(booking_d.hotel_id)
-      setHotel(data)
-    }
-
     const get_user_by_id = async (booking_d) => {
       const data = await getUserById(booking_d.user_id)
       setUser(data)
@@ -47,14 +41,12 @@ import { useEffect, useState } from "react"
 
     useEffect(() => {
       
-      get_hotel_by_id(booking)
       get_user_by_id(booking)
     }, [])
 
     useEffect(() => {
 
       setBooking(booking_data)
-      get_hotel_by_id(booking_data)
       get_user_by_id(booking_data)
     }, [booking, bookings, booking_data])
 
@@ -111,7 +103,7 @@ import { useEffect, useState } from "react"
         </div>
         <div className="flex justify-between mb-4 border-t border-gray-200 pt-2">
           <div className="text-sm font-bold">Hotel:</div>
-          <div className="text-sm">{hotel != null ? hotel.title : "This hotel is no longer available"}</div>
+          <div className="text-sm">{booking.hotel_title}</div>
         </div>
         
         <div className="flex justify-between mb-4">
