@@ -35,12 +35,13 @@ func init() {
 
 func (s *bookingService) CreateBooking(bookingDto dto.Booking) (dto.Booking, e.ApiError) {
 	booking := model.Booking{
-		Total:   bookingDto.Total,
-		DateIn:  bookingDto.DateIn,
-		DateOut: bookingDto.DateOut,
-		UserID:  bookingDto.UserID,
-		HotelID: bookingDto.HotelID,
-		Active:  true,
+		Total:      bookingDto.Total,
+		DateIn:     bookingDto.DateIn,
+		DateOut:    bookingDto.DateOut,
+		UserID:     bookingDto.UserID,
+		HotelID:    bookingDto.HotelID,
+		HotelTitle: bookingDto.HotelTitle,
+		Active:     true,
 	}
 
 	if booking.Total <= 0 {
@@ -87,13 +88,14 @@ func (s *bookingService) GetBookingById(booking_id uuid.UUID) (dto.Booking, e.Ap
 	}
 
 	bookingDto := dto.Booking{
-		BookingID: booking.BookingID,
-		Total:     booking.Total,
-		UserID:    booking.UserID,
-		HotelID:   booking.HotelID,
-		DateIn:    booking.DateIn,
-		DateOut:   booking.DateOut,
-		Active:    booking.Active,
+		BookingID:  booking.BookingID,
+		Total:      booking.Total,
+		UserID:     booking.UserID,
+		HotelID:    booking.HotelID,
+		HotelTitle: booking.HotelTitle,
+		DateIn:     booking.DateIn,
+		DateOut:    booking.DateOut,
+		Active:     booking.Active,
 	}
 
 	return bookingDto, nil
@@ -115,6 +117,7 @@ func (s *bookingService) GetBookings() (dto.Bookings, e.ApiError) {
 		bookingDto.DateIn = booking.DateIn
 		bookingDto.DateOut = booking.DateOut
 		bookingDto.HotelID = booking.HotelID
+		bookingDto.HotelTitle = booking.HotelTitle
 		bookingDto.Active = booking.Active
 
 		bookingsDto = append(bookingsDto, bookingDto)
@@ -141,6 +144,7 @@ func (s *bookingService) GetBookingsByUserId(id uuid.UUID) (dto.Bookings, e.ApiE
 		bookingDto.DateIn = booking.DateIn
 		bookingDto.DateOut = booking.DateOut
 		bookingDto.HotelID = booking.HotelID
+		bookingDto.HotelTitle = booking.HotelTitle
 		bookingDto.Active = booking.Active
 
 		bookingsDto = append(bookingsDto, bookingDto)
@@ -171,6 +175,7 @@ func (s *bookingService) SearchBookings(hotel string, user string, dateIn time.T
 		bookingDto.DateIn = booking.DateIn
 		bookingDto.DateOut = booking.DateOut
 		bookingDto.HotelID = booking.HotelID
+		bookingDto.HotelTitle = booking.HotelTitle
 		bookingDto.Active = booking.Active
 
 		bookingsDto = append(bookingsDto, bookingDto)
@@ -198,13 +203,14 @@ func (s *bookingService) SetActiveBooking(bookingDto dto.Booking) (dto.Booking, 
 	}
 
 	booking := model.Booking{
-		BookingID: bookingDto.BookingID,
-		HotelID:   bookingDto.HotelID,
-		UserID:    bookingDto.UserID,
-		Total:     bookingDto.Total,
-		DateIn:    bookingDto.DateIn,
-		DateOut:   bookingDto.DateOut,
-		Active:    bookingDto.Active,
+		BookingID:  bookingDto.BookingID,
+		HotelID:    bookingDto.HotelID,
+		HotelTitle: bookingDto.HotelTitle,
+		UserID:     bookingDto.UserID,
+		Total:      bookingDto.Total,
+		DateIn:     bookingDto.DateIn,
+		DateOut:    bookingDto.DateOut,
+		Active:     bookingDto.Active,
 	}
 
 	booking = bookingClient.BookingClient.UpdateBooking(booking)
