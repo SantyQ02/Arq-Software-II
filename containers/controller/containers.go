@@ -51,6 +51,34 @@ func DeleteContainer(c *gin.Context) {
 
 }
 
+func StartContainer(c *gin.Context) {
+
+	container_id := c.Param("container_id")
+
+	er := service.ContainersService.StartContainer(container_id)
+	if er != nil {
+		c.JSON(er.Status(), gin.H{"error": er.Message()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Container started successfully"})
+
+}
+
+func StopContainer(c *gin.Context) {
+
+	container_id := c.Param("container_id")
+
+	er := service.ContainersService.StopContainer(container_id)
+	if er != nil {
+		c.JSON(er.Status(), gin.H{"error": er.Message()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Container stopped successfully"})
+
+}
+
 func RestartContainer(c *gin.Context) {
 
 	container_id := c.Param("container_id")

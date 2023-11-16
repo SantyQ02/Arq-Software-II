@@ -13,23 +13,8 @@ import { useEffect, useState } from "react"
     const [active, setActive] = useState(booking_data.active)
     const [booking, setBooking] = useState(booking_data)
 
-    const [hotel, setHotel] = useState(null)
-
-    useEffect(() => {
-      const get_hotel_by_id = async () => {
-        const data = await getHotelById(booking.hotel_id)
-        setHotel(data)
-      }
-      get_hotel_by_id()
-    }, [])
-
     useEffect(() => {
       setBooking(booking_data)
-      const get_hotel_by_id = async () => {
-        const data = await getHotelById(booking.hotel_id)
-        setHotel(data)
-      }
-      get_hotel_by_id()
     }, [booking, booking_data])
 
     const handleCancelBooking = async (e) => {
@@ -84,7 +69,7 @@ import { useEffect, useState } from "react"
         </div>
         <div className="flex justify-between mb-4">
           <div className="text-sm font-bold">Hotel:</div>
-          <div className="text-sm">{hotel != null && hotel.title}</div>
+          <div className="text-sm">{booking.hotel_title}</div>
         </div>
         <div className="flex justify-between mb-4">
           <div className="text-sm font-bold">Hotel ID:</div>
