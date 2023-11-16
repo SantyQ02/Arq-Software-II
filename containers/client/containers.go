@@ -20,6 +20,8 @@ type containersClient struct{}
 type containersClientInterface interface {
 	GetContainersStats()(dto.ContainersStats, error)
 	CreateContainer(service string, quantity uint)(error)
+	StartContainer(container_id string)(error)
+	StopContainer(container_id string)(error)
 	DeleteContainer(container_id string)(error)
 	RestartContainer(container_id string)(error)
 	GetContainersStatsByService(service string)(dto.ContainersStats, error)
@@ -35,7 +37,7 @@ func init() {
 
 func (c *containersClient) GetContainersStats()(dto.ContainersStats, error) {
 
-	containerIDsCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "ps", "-q")
+	containerIDsCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "ps", "-q", "-a")
 	containerIDsOutput, err := containerIDsCmd.Output()
 	if err != nil {
 		log.Error("aca 1")
@@ -131,6 +133,50 @@ func (c *containersClient) DeleteContainer(container_id string)(error) {
 	deleteContainerCmd := exec.Command("docker", "rm", "-f", container_id)
 	if err := deleteContainerCmd.Run(); err != nil {
 		log.Error("Error while deleting the container")
+	}
+
+	restartServiceCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "restart", fmt.Sprintf("nginx_%s", serviceName))
+	if err := restartServiceCmd.Run(); err != nil {
+		log.Error("Error while restarting nginx")
+	}
+
+	return nil
+}
+
+func (c *containersClient) StartContainer(container_id string)(error) {
+
+	serviceNameCmd := exec.Command("docker", "inspect", "--format", "{{ index .Config.Labels \"com.docker.compose.service\" }}", container_id)
+	serviceNameOutput, err := serviceNameCmd.Output()
+	if err != nil {
+		log.Error("Error while searching the service name")
+	}
+	serviceName := strings.TrimRight(string(serviceNameOutput), "\n")
+
+	deleteContainerCmd := exec.Command("docker", "start", container_id)
+	if err := deleteContainerCmd.Run(); err != nil {
+		log.Error("Error while starting the container")
+	}
+
+	restartServiceCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "restart", fmt.Sprintf("nginx_%s", serviceName))
+	if err := restartServiceCmd.Run(); err != nil {
+		log.Error("Error while restarting nginx")
+	}
+
+	return nil
+}
+
+func (c *containersClient) StopContainer(container_id string)(error) {
+
+	serviceNameCmd := exec.Command("docker", "inspect", "--format", "{{ index .Config.Labels \"com.docker.compose.service\" }}", container_id)
+	serviceNameOutput, err := serviceNameCmd.Output()
+	if err != nil {
+		log.Error("Error while searching the service name")
+	}
+	serviceName := strings.TrimRight(string(serviceNameOutput), "\n")
+
+	deleteContainerCmd := exec.Command("docker", "stop", container_id)
+	if err := deleteContainerCmd.Run(); err != nil {
+		log.Error("Error while starting the container")
 	}
 
 	restartServiceCmd := exec.Command("docker-compose", "-f", os.Getenv("DOCKER_FILE_PATH"), "restart", fmt.Sprintf("nginx_%s", serviceName))

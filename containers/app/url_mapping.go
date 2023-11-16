@@ -11,7 +11,10 @@ func mapUrls() {
 
 	containers.GET("/", controller.GetContainersStats)
 	containers.POST("/", controller.CreateContainer)
-	containers.DELETE("/:container_id", controller.DeleteContainer)
+	
+	containers.DELETE("/delete/:container_id", controller.DeleteContainer)
+	containers.GET("/start/:container_id", controller.StartContainer)
+	containers.GET("/stop/:container_id", controller.StopContainer)
 	containers.GET("/restart/:container_id", controller.RestartContainer)
 
 	log.Info("Finishing mappings configurations")

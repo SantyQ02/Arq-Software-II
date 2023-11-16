@@ -16,6 +16,8 @@ type containersService struct{}
 type containersServiceInterface interface {
 	GetContainersStats()(dto.ContainersStats, e.ApiError)
 	CreateContainer(createDto dto.CreateContainer)(e.ApiError)
+	StartContainer(container_id string)(e.ApiError)
+	StopContainer(container_id string)(e.ApiError)
 	DeleteContainer(container_id string)(e.ApiError)
 	RestartContainer(container_id string)(e.ApiError)
 }
@@ -63,7 +65,27 @@ func (s *containersService) DeleteContainer(container_id string)(e.ApiError) {
 
 	err := client.ContainersClient.DeleteContainer(container_id)
 	if err != nil {
-		return e.NewInternalServerApiError("Something went wrong while creating the container", err)
+		return e.NewInternalServerApiError("Something went wrong while deleting the container", err)
+	}
+
+	return nil
+}
+
+func (s *containersService) StartContainer(container_id string)(e.ApiError) {
+
+	err := client.ContainersClient.StartContainer(container_id)
+	if err != nil {
+		return e.NewInternalServerApiError("Something went wrong while starting the container", err)
+	}
+
+	return nil
+}
+
+func (s *containersService) StopContainer(container_id string)(e.ApiError) {
+
+	err := client.ContainersClient.StopContainer(container_id)
+	if err != nil {
+		return e.NewInternalServerApiError("Something went wrong while stopping the container", err)
 	}
 
 	return nil
