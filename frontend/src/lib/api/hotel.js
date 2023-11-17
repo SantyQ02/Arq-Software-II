@@ -2,23 +2,28 @@ import { alert } from "../utils/alert";
 const { default: axios } = require("axios");
 import Cookies from "js-cookie";
 
-export async function createHotel(title, description, price_per_day, rooms) {
+export async function createHotel(amadeus_id, title,city_code, description, price_per_day, amenities) {
 
-    rooms = parseInt(rooms)
     price_per_day = parseFloat(price_per_day)
 
+    const token = Cookies.get("token")
+
     const config = {
+        
+        withCredentials: true,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${token}`, 
         },
-        withCredentials: true
     };
 
     const body = JSON.stringify({
+        amadeus_id,
         title,
+        city_code,
         description,
         price_per_day,
-        rooms
+        amenities
     });
 
     try {
@@ -103,9 +108,7 @@ export async function insertPhoto(hotelID, file) {
     // });
 
     try {
-        const res = await axios.post(`${process.env.NEXT_PUBLIC_URL_API_CLIENT}/api/hotel/photo/upload/${hotelID}`, formData, config)
-        // const res = await axios.post(`${process.env.NEXT_PUBLIC_URL_API}/api/hotel/photo/upload/${hotelID}`, formData, config)
-        // const res = await axios.post(`/api/hotel/photo/${hotelID}`, formData, config)
+        const res = await axios.post(`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS_CLIENT}/api/hotel/upload/${hotelID}`, formData, config)
         if (res.status === 201) {
             alert('success', 'Photo added successfully')
 
@@ -283,7 +286,7 @@ export async function getAvailableHotels(rooms, date_in, date_out){
 
 export async function getHotelById(id){
     try {
-        const res = await axios.get(`/api/hotel/${id}`, { withCredentials: true })
+        const res = await axios.get(`http://localhost:${process.env.PORT}/api/hotel/${id}`, { withCredentials: true })
         if (res.status === 200) {
             return res.data.hotel
         }
@@ -293,7 +296,7 @@ export async function getHotelById(id){
         }
     } catch (error) {
         const errorMessage = error.response?.data?.error ?? 'Unknown error occurred';
-        //console.log(errorMessage)
+        console.log(error)
         return null
     }
 }

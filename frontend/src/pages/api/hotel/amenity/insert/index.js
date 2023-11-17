@@ -3,7 +3,7 @@
 
   export default async function handler(req, res) {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api/hotel/amenitie`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/hotel/amenitie`, {
         method: 'POST',
         body: JSON.stringify(req.body), 
         headers: {

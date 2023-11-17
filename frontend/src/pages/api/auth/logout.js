@@ -2,7 +2,7 @@
 
 export default async function handler(req, res) {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_API}/api/auth/logout`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_URL_SERVICE_BUSINESS}/api/auth/logout`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

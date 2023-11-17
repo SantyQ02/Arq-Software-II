@@ -1,0 +1,7 @@
+FROM golang:alpine
+
+WORKDIR /api
+COPY .env.docker ./.env
+COPY go.mod go.sum ./
+
+RUN go mod tidy

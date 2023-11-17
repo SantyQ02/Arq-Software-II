@@ -1,0 +1,4 @@
+*/.env
+go/
+node/
+auto_scaling.py
