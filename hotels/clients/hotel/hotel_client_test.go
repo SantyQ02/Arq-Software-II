@@ -2,16 +2,14 @@ package hotelClient
 
 import (
 	"mvc-go/model"
+	"testing"
+	"github.com/google/uuid"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/stretchr/testify/assert"
 	"mvc-go/utils/initializers"
 	"os"
-	"testing"
-	"time"
-
-	"github.com/google/uuid"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"context"
 	log "github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 	"go.mongodb.org/mongo-driver/mongo"
     "go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -19,6 +17,7 @@ import (
 var (
 	client *mongo.Client
 	err error
+	
 )
 
 func init() {
@@ -35,19 +34,20 @@ func init() {
 	cli,err := mongo.Connect(context.TODO(), clientOpts)
 	client=cli
 	if err!=nil{
-		return err
+		log.Fatal(err)
 	}
 
 	Db = client.Database(DBName) 
 
 }
 
+
 func initTestClient() {
 	HotelClient = &hotelClient{}
 }
 
-var hotelID uuid.UUID
 var hotelModel = model.Hotel{
+	HotelID: uuid.New().String(),
 	AmadeusID:      "0000",
 	Title:         	"Test",
 	Description:    "Test desciption",
@@ -62,9 +62,8 @@ func TestInsertHotel(t *testing.T) {
 	initTestClient()
 	hotel := HotelClient.InsertHotel(hotelModel)
 
-	hotelID = hotel.HotelID
 	assert.NotEqual(t, uuid.Nil, hotel.HotelID)
-	assert.Equal(t, hotelID, hotel.HotelID)
+	assert.Equal(t, hotelModel.HotelID, hotel.HotelID)
 	assert.Equal(t, hotelModel.AmadeusID, hotel.AmadeusID)
 	assert.Equal(t, hotelModel.Title, hotel.Title)
 	assert.Equal(t, hotelModel.Description, hotel.Description)
@@ -77,10 +76,10 @@ func TestInsertHotel(t *testing.T) {
 
 func TestGetHotelById(t *testing.T) {
 	initTestClient()
-	hotel := HotelClient.GetHotelById(hotelID.String())
+	hotel := HotelClient.GetHotelById(hotelModel.HotelID)
 
 	assert.NotEqual(t, uuid.Nil, hotel.HotelID)
-	assert.Equal(t, hotelID, hotel.HotelID)
+	assert.Equal(t, hotelModel.HotelID, hotel.HotelID)
 	assert.Equal(t, hotelModel.AmadeusID, hotel.AmadeusID)
 	assert.Equal(t, hotelModel.Title, hotel.Title)
 	assert.Equal(t, hotelModel.Description, hotel.Description)
@@ -91,10 +90,21 @@ func TestGetHotelById(t *testing.T) {
 	assert.Equal(t, hotelModel.Active, hotel.Active)
 }
 
+func TestGetHotels(t *testing.T) {
+	initTestClient()
+
+	hotels := HotelClient.GetHotels()
+
+	assert.NotNil(t, hotels)
+	assert.NotEqual(t, model.Hotels{}, hotels)
+}
+
+
 func TestUpdateHotel(t *testing.T) {
 	initTestClient()
+
 	var hotelModelUpdate = model.Hotel{
-		HotelID:           hotelID,
+		HotelID:          hotelModel.HotelID,
 		AmadeusID:        "1111",
 		Title:            "New title",
 		PricePerDay:      8888,
@@ -107,7 +117,7 @@ func TestUpdateHotel(t *testing.T) {
 	hotel := HotelClient.UpdateHotel(hotelModelUpdate)
 
 	assert.NotEqual(t, uuid.Nil, hotel.HotelID)
-	assert.Equal(t, hotelID, hotel.HotelID)
+	assert.Equal(t, hotelModelUpdate.HotelID, hotel.HotelID)
 	assert.Equal(t, hotelModelUpdate.AmadeusID, hotel.AmadeusID)
 	assert.Equal(t, hotelModelUpdate.Title, hotel.Title)
 	assert.Equal(t, hotelModelUpdate.Description, hotel.Description)
@@ -117,9 +127,9 @@ func TestUpdateHotel(t *testing.T) {
 	assert.Equal(t, hotelModelUpdate.Amenities, hotel.Amenities)
 	assert.Equal(t, hotelModelUpdate.Active, hotel.Active)
 }
-func TestUpdateHotelError(t *testing.T) {
+func TestUpdateHotel_Failure(t *testing.T) {
 	initTestClient()
-	var hotelModelUpdate = model.User{
+	var hotelModelUpdate = model.Hotel{
 		AmadeusID:        "1111",
 		Title:            "New title",
 		PricePerDay:      8888,
@@ -131,11 +141,13 @@ func TestUpdateHotelError(t *testing.T) {
 	}
 	hotel := HotelClient.UpdateHotel(hotelModelUpdate)
 
-	assert.Equal(t, uuid.Nil, hotel.HotelID)
-	assert.Equal(t, model.User{}, hotel)
+	assert.Equal(t, "", hotel.HotelID)
+	assert.Equal(t, model.Hotel{}, hotel)
 }
 func TestDeleteHotel(t *testing.T) {
-	err := HotelClient.DeleteHotel(hotelID.String())
+	initTestClient()
+	err := HotelClient.DeleteHotel(hotelModel.HotelID)
 
 	assert.Nil(t, err)
 }
+

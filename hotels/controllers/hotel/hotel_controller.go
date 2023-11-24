@@ -10,6 +10,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func GetHotels(c *gin.Context) {
+
+	hotels, er := hotelService.HotelService.GetHotels()
+	if er != nil {
+		c.JSON(er.Status(), gin.H{"error": er.Message()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"hotels": hotels})
+
+}
 
 func GetHotelById(c *gin.Context) {
 	uuid, err := uuid.Parse(c.Param("hotelID"))
@@ -127,7 +138,7 @@ func UploadPhoto(c *gin.Context) {
 	var payload dto.Photo
 	payload.Url = file.Filename
 
-	photo, er := hotelService.HotelService.InsertPhoto(payload, uuid)
+	photo, er := hotelService.HotelService.UploadPhoto(payload, uuid)
 	if er != nil {
 		c.JSON(er.Status(), gin.H{"error": er.Message()})
 		return
@@ -137,3 +148,4 @@ func UploadPhoto(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"photo": photo})
 }
+

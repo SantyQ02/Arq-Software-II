@@ -19,8 +19,9 @@ type hotelServiceInterface interface {
 	InsertHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError)
 	UpdateHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError)
 	DeleteHotel(id uuid.UUID) e.ApiError
+	GetHotels() (dto.Hotels, e.ApiError)
 	GetHotelById(id uuid.UUID) (dto.Hotel, e.ApiError)
-	InsertPhoto(photoDto dto.Photo, hotelId uuid.UUID) (dto.Photo, e.ApiError)
+	UploadPhoto(photoDto dto.Photo, hotelId uuid.UUID) (dto.Photo, e.ApiError)
 	SendMessage(id uuid.UUID, action string)
 }
 
@@ -68,15 +69,6 @@ func (s *hotelService) SendMessage(id uuid.UUID, action string){
 func (s *hotelService) InsertHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 
 	var Photos model.Photos
-
-	// for _, photo := range hotelDto.Photos {
-	// 		var modelPhoto model.Photo
-
-	// 		modelPhoto.PhotoID = uuid.New().String()
-	// 		modelPhoto.Url = photo.Url
-
-	// 		Photos = append(Photos, modelPhoto)
-	// 	}
 	
 	var Amenities model.Amenities
 
@@ -108,19 +100,10 @@ func (s *hotelService) InsertHotel(hotelDto dto.Hotel) (dto.Hotel, e.ApiError) {
 
 	hotelDto.HotelID,_ = uuid.Parse(hotel.HotelID)
 
-	// var newPhotos dto.Photos
 	var newAmenities dto.Amenities
 
-	// hotelDto.Photos = newPhotos
 	hotelDto.Amenities = newAmenities
-
-	// for _, photo := range hotel.Photos {
-	// 	var dtoPhoto dto.Photo
-
-	// 	dtoPhoto.PhotoID,_ = uuid.Parse(photo.PhotoID)
-	// 	dtoPhoto.Url = photo.Url
-	// 	hotelDto.Photos = append(hotelDto.Photos, dtoPhoto)
-	// }
+	
 	for _, amenity := range hotel.Amenities {
 		var dtoAmenity dto.Amenity
 
@@ -195,6 +178,50 @@ func (s *hotelService) DeleteHotel(id uuid.UUID) e.ApiError {
 
 }
 
+func (s *hotelService) GetHotels() (dto.Hotels, e.ApiError) {
+
+	hotels := hotelClient.HotelClient.GetHotels()
+	if len(hotels) == 0 {
+		return dto.Hotels{}, e.NewNotFoundApiError("Hotels not found")
+	}
+
+	var hotelsDto dto.Hotels
+
+	for _, hotel := range hotels {
+
+		idhotel,_ := uuid.Parse(hotel.HotelID)
+
+		hotelDto := dto.Hotel{
+			HotelID:     idhotel,
+			AmadeusID: 	 hotel.AmadeusID,
+			CityCode:    hotel.CityCode,
+			Title:       hotel.Title,
+			Description: hotel.Description,
+			PricePerDay: hotel.PricePerDay,
+			Active:      hotel.Active,
+		}
+		for _, photo := range hotel.Photos {
+			var dtoPhoto dto.Photo
+
+			dtoPhoto.PhotoID,_ = uuid.Parse(photo.PhotoID)
+			dtoPhoto.Url = photo.Url
+			hotelDto.Photos = append(hotelDto.Photos, dtoPhoto)
+		}
+		for _, amenity := range hotel.Amenities {
+			var dtoAmenity dto.Amenity
+
+			dtoAmenity.AmenityID,_ = uuid.Parse(amenity.AmenityID)
+			dtoAmenity.Title = amenity.Title
+
+			hotelDto.Amenities = append(hotelDto.Amenities, dtoAmenity)
+		}
+
+		hotelsDto = append(hotelsDto, hotelDto)
+	}
+
+	return hotelsDto, nil
+}
+
 
 func (s *hotelService) GetHotelById(id uuid.UUID) (dto.Hotel, e.ApiError) {
 
@@ -235,7 +262,7 @@ func (s *hotelService) GetHotelById(id uuid.UUID) (dto.Hotel, e.ApiError) {
 	return hotelDto, nil
 }
 
-func (s *hotelService) InsertPhoto(photoDto dto.Photo, hotelId uuid.UUID) (dto.Photo, e.ApiError) {
+func (s *hotelService) UploadPhoto(photoDto dto.Photo, hotelId uuid.UUID) (dto.Photo, e.ApiError) {
 	photo := model.Photo{
 		Url:     photoDto.Url,
 		PhotoID: uuid.New().String(),

@@ -36,15 +36,34 @@ export default function HotelDetail({ hotel, setHotel }) {
 
   const get_hotel_by_id = async () => {
 
-    const updatedHotel = await getHotelById(hotel.hotel_id)
+    const updatedHotel = await updateHotel(hotel.hotel_id, hotel.amadeus_id, title, description, price_per_day, city_code, hotel.active, hotel.photos, amenities,'');
     // const data = await getAmenities()
     const filtered_data = data?.filter(amenity => !updatedHotel.amenities?.some(hotelAmenity => hotelAmenity.amenitie_id === amenity.amenitie_id));
     // setAmenities(filtered_data)
     setHotel(updatedHotel)
   }
 
+  const new_amenities = [
+    {
+      amenity_id: "29a81648-d55e-4d83-9b1a-30bdd0d24885",
+      title: "Piscina"
+    },
+    {
+      amenity_id: "f9d81f53-f8c3-4b21-8356-6cbda1d5087f",
+      title: "Wifi"
+    },
+    {
+      amenity_id: "87cfc437-0623-4cd4-ac19-65883f1a2f32",
+      title: "Gimnasio"
+    },
+    {
+      amenity_id: "30507f09-b43d-4329-a003-bd5fb39e03b9",
+      title: "Playground"
+    },
+  ]
+
   // Get Amenities
-  const [amenities, setAmenities] = useState(null)
+  const [amenities, setAmenities] = useState(hotel.amenities || [])
   const [selectedAmenities, setSelectedAmenities] = useState([]);
 
   const get_amenities = async () => {
@@ -60,26 +79,19 @@ export default function HotelDetail({ hotel, setHotel }) {
 
   //Add amenity
   const handleAddAmenity = async amenity_id => {
-    const amenities_array = [amenity_id]
+    const new_amenity = new_amenities?.find(amenity => amenity.amenity_id == amenity_id)
 
-    await associateAmenities(hotel.hotel_id, amenities_array)
-    get_hotel_by_id()
-    const filtered_amenities = amenities?.filter(amenity => amenity.amenitie_id !== amenity_id);
-
-    setAmenities(filtered_amenities)
+    if (!amenities.some(existingAmenity => existingAmenity.amenity_id === amenity_id)){
+      setAmenities([...amenities, new_amenity])
+    }
 
   }
 
   //Remove amenity
   const handleRemoveAmenity = async amenity_id => {
-    const amenities_array = [amenity_id]
+    const filtered_amenities = amenities?.filter(amenity => amenity.amenity_id !== amenity_id);
 
-    await dissociateAmenities(hotel.hotel_id, amenities_array)
-    get_hotel_by_id()
-    // const filtered_amenities = amenities?.filter(amenity => amenity.amenitie_id !== amenity_id);
-
-    // setAmenities(filtered_amenities)
-
+    setAmenities(filtered_amenities)
 
   }
 
@@ -108,6 +120,12 @@ export default function HotelDetail({ hotel, setHotel }) {
 
     if (file) {
       await insertPhoto(hotel.hotel_id, file)
+      // const new_photo = {
+        
+      // }
+      
+      // setPhotos([...photo, new_photo])
+      
     }
     setFile(null)
 
@@ -118,7 +136,10 @@ export default function HotelDetail({ hotel, setHotel }) {
   //Delete photo
   const handleDeletePhoto = async (e, photo_id) => {
     e.preventDefault()
-    await deletePhoto(photo_id)
+
+    const filtered_photos = hotel.photos?.filter(photo => photo.photo_id !== photo_id);
+
+    await updateHotel(hotel.hotel_id, hotel.amadeus_id, hotel.title, hotel.description, hotel.price_per_day, hotel.city_code, hotel.active, filtered_photos, hotel.amenities, 'Photo deleted successfully!')
     router.reload()
 
   }
@@ -128,7 +149,7 @@ export default function HotelDetail({ hotel, setHotel }) {
   const [editableFields, setEditableFields] = useState({
     title: hotel.title,
     price_per_day: hotel.price_per_day,
-    rooms: hotel.rooms,
+    city_code: hotel.city_code,
     description: hotel.description,
   });
 
@@ -141,8 +162,8 @@ export default function HotelDetail({ hotel, setHotel }) {
   };
 
   const handleEditClick = async () => {
-    const { title, price_per_day, rooms, description } = editableFields;
-    const updatedHotel = await updateHotel(hotel.hotel_id, title, description, price_per_day, rooms, hotel.active);
+    const { title, price_per_day, city_code, description } = editableFields;
+    const updatedHotel = await updateHotel(hotel.hotel_id, hotel.amadeus_id, title, description, price_per_day, city_code, hotel.active, hotel.photos, amenities, 'Hotel Updated');
 
     if (updatedHotel) {
       // Realizar acciones adicionales después de la actualización exitosa
@@ -233,11 +254,10 @@ export default function HotelDetail({ hotel, setHotel }) {
 
             <div className="mt-3">
               <h2 className="text-base text-gray-700 space-y-6">
-                Rooms:{' '}
+                City:{' '}
                 <input
-                  name="rooms"
-                  type="number"
-                  value={editableFields.rooms}
+                  name="city_code"
+                  value={editableFields.city_code}
                   onChange={handleFieldChange}
                   className="w-full border-gray-300 rounded-md py-2"
                 />
@@ -269,9 +289,9 @@ export default function HotelDetail({ hotel, setHotel }) {
               <RadioGroup value={selectedSize} onChange={setSelectedSize} className="mt-4">
                 <RadioGroup.Label className="sr-only">Choose a size</RadioGroup.Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {hotel.amenities && hotel.amenities.map((amenity) => (
+                  {amenities && amenities.map((amenity) => (
                     <RadioGroup.Option
-                      key={amenity.amenitie_id}
+                      key={amenity.amenity_id}
                       value={amenity.title}
                       disabled={!amenity}
                       className={({ active }) =>
@@ -283,7 +303,7 @@ export default function HotelDetail({ hotel, setHotel }) {
                         )
                       }
                     >
-                      <button className='flex items-center' onClick={e => handleRemoveAmenity(amenity.amenitie_id)}>
+                      <button className='flex items-center' onClick={e => handleRemoveAmenity(amenity.amenity_id)}>
                           
                         <TrashIcon className='h-5 w-5 text-red-400' />
                         <RadioGroup.Label as="span">{amenity.title.toUpperCase()}</RadioGroup.Label>
@@ -374,9 +394,9 @@ export default function HotelDetail({ hotel, setHotel }) {
               <RadioGroup value={selectedSize} onChange={setSelectedSize} className="mt-4">
                 <RadioGroup.Label className="sr-only">Choose a size</RadioGroup.Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {amenities && amenities.map((amenity) => (
+                  {new_amenities && new_amenities.filter((amenity) => !amenities.some((existingAmenity) => existingAmenity.amenity_id === amenity.amenity_id)).map((amenity) => (
                     <RadioGroup.Option
-                      key={amenity.amenitie_id}
+                      key={amenity.amenity_id}
                       value={amenity.title}
                       disabled={!amenity}
                       className={({ active }) =>
@@ -388,7 +408,7 @@ export default function HotelDetail({ hotel, setHotel }) {
                         )
                       }
                     >
-                      <button onClick={e => handleAddAmenity(amenity.amenitie_id)} className='flex items-center'>
+                      <button onClick={e => handleAddAmenity(amenity.amenity_id)} className='flex items-center'>
                         <PlusSmIcon className='h-5 w-5 text-gray-400' />
                         <RadioGroup.Label as="span">{amenity.title.toUpperCase()}</RadioGroup.Label>
                       </button>
