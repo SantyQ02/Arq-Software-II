@@ -1,3 +1,45 @@
+# Prod
+steps to run project:
+
+```bash
+docker-compose up -d
+
+## In a new terminal go to "containers" folder:
+cd containers
+go mod tidy
+go run main.go
+
+## In a new terminal go to "frontend_containers" folder:
+cd frontend_containers
+npm install
+npm run build
+npm run start
+```
+
+go to Containers Managment: http://localhost:3000  
+restart nginx services (frontend, hotels, search & business) (por las dudas)
+
+Ready:  
+main frontend: http://localhost:81
+
+To do stress-test there are 2 ways:  
+
+1)  (god)
+```bash
+## Install apache benchmark (Installed by default on mac)
+ab -n 100000 -c 100 "http://localhost:81/" 
+## (aveces se frena solo estate atento bro)
+
+```
+
+2)  (de giles)
+```bash
+cd containers/stress-test
+python3 test.py
+
+## (run on several terminals to stress the frontend service even more.)
+```
+
 # Test
 
     docker-compose -f docker-compose-dev.yml up -d
