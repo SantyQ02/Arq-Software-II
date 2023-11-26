@@ -62,9 +62,9 @@ export default function HotelsList() {
                                                         <div className="flex justify-between">
                                                             <h3 className="text-lg font-bold text-gray-700 hover:text-gray-800">
 
-                                                                Name: {hotel.title}
-                                                                <p className="font-medium text-gray-700 hover:text-gray-800">
-                                                                    Description: {hotel.description}
+                                                                {hotel.title}
+                                                                <p className="font-light text-gray-700 hover:text-gray-800">
+                                                                    {hotel.description}
                                                                 </p>
                                                             </h3>
                                                         </div>
