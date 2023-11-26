@@ -49,9 +49,10 @@ func initTestClient() {
 
 var checkInDate, _ = time.Parse("2006-01-02T15:04:05.000Z", "2022-10-02")
 var checkOutDate, _ = time.Parse("2006-01-02T15:04:05.000Z", "2022-10-03")
-var hotelID uuid.UUID
+var hotelID = uuid.New()
 var hotelMappingModel = model.HotelMapping{
 	AmadeusID: "54DRG5",
+	HotelID: hotelID,
 }
 
 func TestInsertHotelMapping(t *testing.T) {

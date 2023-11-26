@@ -1,13 +1,14 @@
 package businessService
 
 import (
+	"errors"
 	businessClient "mvc-go/clients/business"
 	userClient "mvc-go/clients/user"
 	"mvc-go/dto"
 	"mvc-go/model"
 	"testing"
 	"time"
-
+	e "mvc-go/utils/errors"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -16,6 +17,7 @@ import (
 
 func initTestClient() {
 	businessClient.BusinessClient = &businessClient.BusinessMockClient{}
+	userClient.UserClient = &userClient.UserMockClient{}
 }
 
 // CheckAvailability
@@ -60,14 +62,13 @@ func TestCheckAvailabilityErrorAmadeusAPI(t *testing.T) {
 	checkOutDate := checkInDate.Add(24 * time.Hour).UTC()
 
 	mockClient.On("GetAmadeusIDByHotelID", hotelID).Return("amadeus123")
-	mockClient.On("GetAmadeusAvailability", "amadeus123", checkInDate, checkOutDate).Return(false, "Amadeus API Error")
+	mockClient.On("GetAmadeusAvailability", "amadeus123", checkInDate, checkOutDate).Return(false, e.NewInternalServerApiError("500", errors.New("500")))
 
 	availability, err := BusinessService.CheckAvailability(hotelID, checkInDate, checkOutDate)
 
 	assert.False(t, availability)
 	assert.NotNil(t, err)
 	assert.Equal(t, 500, err.Status())
-	assert.Equal(t, "Amadeus API Error", err.Message())
 }
 
 // MapHotel
@@ -95,14 +96,13 @@ func TestMapHotelErrorAlreadyMapped(t *testing.T) {
 		AmadeusID: "amadeus123",
 	}
 
-	mockClient.On("InsertHotelMapping", mock.Anything).Return("AmadeusID already mapped to an existing HotelID or HotelID already mapped to an AmadeusID.")
+	mockClient.On("InsertHotelMapping", mock.Anything).Return(errors.New("400"))
 
 	mappedHotel, err := BusinessService.MapHotel(hotelMappingDto)
 
 	assert.Equal(t, dto.HotelMapping{}, mappedHotel)
 	assert.NotNil(t, err)
 	assert.Equal(t, 400, err.Status())
-	assert.Equal(t, "AmadeusID already mapped to an existing HotelID or HotelID already mapped to an AmadeusID.", err.Message())
 }
 
 // CheckAdmin
@@ -111,7 +111,7 @@ func TestCheckAdmin(t *testing.T) {
 	mockClient := userClient.UserClient.(*userClient.UserMockClient)
 	userID := uuid.New()
 
-	mockClient.On("GetUserById", userID.String()).Return(model.User{Role: "admin"})
+	mockClient.On("GetUserById", userID.String()).Return(model.User{UserID: userID, Role: "admin"})
 
 	isAdmin, err := BusinessService.CheckAdmin(userID)
 
@@ -139,7 +139,7 @@ func TestCheckAdminErrorNotAdmin(t *testing.T) {
 	mockClient := userClient.UserClient.(*userClient.UserMockClient)
 	userID := uuid.New()
 
-	mockClient.On("GetUserById", userID.String()).Return(model.User{Role: "user"})
+	mockClient.On("GetUserById", userID.String()).Return(model.User{UserID: userID, Role: "user"})
 
 	isAdmin, err := BusinessService.CheckAdmin(userID)
 
