@@ -36,7 +36,7 @@ export default function HotelDetail({ hotel, setHotel }) {
 
   const get_hotel_by_id = async () => {
 
-    const updatedHotel = await updateHotel(hotel.hotel_id, hotel.amadeus_id, title, description, price_per_day, city_code, hotel.active, hotel.photos, amenities,'');
+    const updatedHotel = await updateHotel(hotel.hotel_id, hotel.amadeus_id, title, description, price_per_day, city_code, hotel.active, hotel.photos, amenities, '');
     // const data = await getAmenities()
     const filtered_data = data?.filter(amenity => !updatedHotel.amenities?.some(hotelAmenity => hotelAmenity.amenitie_id === amenity.amenitie_id));
     // setAmenities(filtered_data)
@@ -81,7 +81,7 @@ export default function HotelDetail({ hotel, setHotel }) {
   const handleAddAmenity = async amenity_id => {
     const new_amenity = new_amenities?.find(amenity => amenity.amenity_id == amenity_id)
 
-    if (!amenities.some(existingAmenity => existingAmenity.amenity_id === amenity_id)){
+    if (!amenities.some(existingAmenity => existingAmenity.amenity_id === amenity_id)) {
       setAmenities([...amenities, new_amenity])
     }
 
@@ -121,11 +121,11 @@ export default function HotelDetail({ hotel, setHotel }) {
     if (file) {
       await insertPhoto(hotel.hotel_id, file)
       // const new_photo = {
-        
+
       // }
-      
+
       // setPhotos([...photo, new_photo])
-      
+
     }
     setFile(null)
 
@@ -193,11 +193,11 @@ export default function HotelDetail({ hotel, setHotel }) {
                     {({ selected }) => (
                       <div>
                         <span className="absolute inset-0 rounded-md overflow-hidden">
-                          <Image src={`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/public/${photo.url}`} alt="" className="w-full h-full object-center object-cover" width={1000} height={1000}/>
+                          <Image src={`${process.env.NEXT_PUBLIC_URL_SERVICE_HOTELS}/api/public/${photo.url}`} alt="" className="w-full h-full object-center object-cover" width={1000} height={1000} />
                         </span>
                         <div className='z-50 absolute end-0 top-0'
                           onClick={e => handleDeletePhoto(e, photo.photo_id)}
-                          >
+                        >
 
                           <TrashIcon className='h-7 w-7 text-red-400' />
                         </div>
@@ -243,7 +243,7 @@ export default function HotelDetail({ hotel, setHotel }) {
               <h2 className="text-base text-gray-700  space-y-6">
                 Price per day:{' '}
                 <input
-                type="number"
+                  type="number"
                   name="price_per_day"
                   value={editableFields.price_per_day}
                   onChange={handleFieldChange}
@@ -275,13 +275,6 @@ export default function HotelDetail({ hotel, setHotel }) {
               />
             </div>
 
-            <button
-              className=" inline-block rounded-md border border-transparent bg-indigo-600 px-3 md:px-8 py-3 text-center font-medium text-white hover:bg-indigo-700 ml-auto"
-              onClick={handleEditClick}
-            >
-              Update Changes
-            </button>
-
             <section aria-labelledby="details-heading" className="mt-12">
               <h2 id="details-heading" className="text-3xl text-gray-900">
                 Amenities:
@@ -304,7 +297,7 @@ export default function HotelDetail({ hotel, setHotel }) {
                       }
                     >
                       <button className='flex items-center' onClick={e => handleRemoveAmenity(amenity.amenity_id)}>
-                          
+
                         <TrashIcon className='h-5 w-5 text-red-400' />
                         <RadioGroup.Label as="span">{amenity.title.toUpperCase()}</RadioGroup.Label>
                       </button>
@@ -427,7 +420,12 @@ export default function HotelDetail({ hotel, setHotel }) {
                   ))}
                 </div>
               </RadioGroup>
-
+              <button
+                className="mt-4 inline-block rounded-md border border-transparent bg-indigo-600 px-3 md:px-8 py-3 text-center font-medium text-white hover:bg-indigo-700 ml-auto"
+                onClick={handleEditClick}
+              >
+                Update Changes
+              </button>
 
             </section>
           </>
