@@ -10,6 +10,7 @@ import (
 func HotelRoute(hotel *gin.RouterGroup) {
 	
 	hotel.GET("/:hotelID", hotelController.GetHotelById)
+	hotel.GET("/", hotelController.GetHotels)
 
 	// Only admin:
 	hotel.POST("/",middlewareController.CheckAdmin(),hotelController.InsertHotel)

@@ -1,10 +1,11 @@
 package service
 
 import (
+	"fmt"
 	"mvc-go/client"
 	"mvc-go/dto"
-
 	e "mvc-go/utils/errors"
+
 	// "sync"
 	"time"
 	// "github.com/google/uuid"
@@ -26,6 +27,12 @@ func init() {
 }
 
 func (s *searchService) Search(city string, checkInDate time.Time, checkOutDate time.Time) ([]dto.Hotel, e.ApiError) {
+	cacheKey := fmt.Sprintf("%s/%s/%s", city, checkInDate.Format("2006-01-02"), checkOutDate.Format("2006-01-02"))
+
+	hotelsCache := client.CacheClient.Get(cacheKey)
+	if hotelsCache != nil {
+		return hotelsCache, nil
+	}
 
 	// fetch hotels
 	hotels, err := client.SolrClient.SearchHotels(city)
@@ -42,7 +49,7 @@ func (s *searchService) Search(city string, checkInDate time.Time, checkOutDate 
 
 	for i := range hotels {
 		// wg.Add(1)
-		go func (i int, errCh chan error) {
+		go func(i int, errCh chan error) {
 			// defer wg.Done()
 			hotelCopy := &hotels[i]
 			businessRes, er := client.BusinessClient.GetHotelAvailability(hotelCopy.HotelID, checkInDate, checkOutDate)
@@ -69,17 +76,7 @@ func (s *searchService) Search(city string, checkInDate time.Time, checkOutDate 
 		}
 	}
 
-	// wg.Wait()
-	
-	// select {
-    // case err := <-errCh:
-    //     if err != nil {
-    //         return []dto.Hotel{}, e.NewInternalServerApiError("Something went wrong checking availability", err)
-    //     }
-    // default:
-    //     // No se produjo un error diferente de nil, continúa con la lógica
-    // }
-
+	client.CacheClient.SetWithExpiration(cacheKey, hotels, 5)
 
 	return hotels, nil
 }

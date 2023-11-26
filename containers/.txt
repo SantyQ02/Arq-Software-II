@@ -1,0 +1,6 @@
+para ver los stats de las instancias de search
+docker ps --filter label=com.docker.compose.service=search --format "{{.ID}}" | awk '{print $1}' | xargs docker stats
+
+test de stress:
+
+ab -n 100000 -c 100 "http://localhost:81/"

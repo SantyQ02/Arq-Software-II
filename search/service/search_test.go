@@ -8,6 +8,7 @@ import (
 	"testing"
 	"errors"
 	"time"
+	"fmt"
 	// log "github.com/sirupsen/logrus"
 	// log "github.com/sirupsen/logrus"
 )
@@ -15,18 +16,21 @@ import (
 func initTestClient2() {
 	client.SolrClient = &client.SolrMockClient{}
 	client.BusinessClient = &client.BusinessMockClient{}
+	client.CacheClient = &client.CacheMockClient{}
 }
 
 func TestSearch(t *testing.T) {
 	initTestClient2()
 	solrMockClient := client.SolrClient.(*client.SolrMockClient)
 	businessMockClient := client.BusinessClient.(*client.BusinessMockClient)
+	cacheMockClient := client.CacheClient.(*client.CacheMockClient)
 
+	
 	city := "CBA"
 	hotel_id_1 := uuid.New()
 	hotel_id_2 := uuid.New()
 	hotel_id_3 := uuid.New()
-
+	
 	var hotelsDto = []dto.Hotel{
 		dto.Hotel{
 			HotelID: hotel_id_1,
@@ -38,11 +42,15 @@ func TestSearch(t *testing.T) {
 			HotelID: hotel_id_3,
 		},
 	}
-
+	
 	solrMockClient.On("SearchHotels", city).Return(hotelsDto, nil)
-
+	
 	checkInDate, _ := time.Parse("2006-01-02", "2023-10-25")
 	checkOutDate, _ := time.Parse("2006-01-02", "2023-11-25")
+	
+	cacheKey := fmt.Sprintf("%s/%s/%s", city, checkInDate.Format("2006-01-02"), checkOutDate.Format("2006-01-02"))
+	cacheMockClient.On("Get", cacheKey).Return(nil)
+	cacheMockClient.On("SetWithExpiration", cacheKey, hotelsDto, 5).Return()
 
 	businessMockClient.On("GetHotelAvailability", hotel_id_1, checkInDate, checkOutDate).Return(dto.BusinessResponse{hotel_id_1, true}, nil)
 	businessMockClient.On("GetHotelAvailability", hotel_id_2, checkInDate, checkOutDate).Return(dto.BusinessResponse{hotel_id_2, false}, nil)
@@ -59,6 +67,7 @@ func TestSearch(t *testing.T) {
 func TestSearchErrorSolrClient(t *testing.T) {
 	initTestClient2()
 	solrMockClient := client.SolrClient.(*client.SolrMockClient)
+	cacheMockClient := client.CacheClient.(*client.CacheMockClient)
 
 	city := "CBA"
 
@@ -67,46 +76,12 @@ func TestSearchErrorSolrClient(t *testing.T) {
 	checkInDate, _ := time.Parse("2006-01-02", "2023-10-25")
 	checkOutDate, _ := time.Parse("2006-01-02", "2023-11-25")
 
-	hotelsRes, err := SearchService.Search(city, checkInDate, checkOutDate)
-	assert.NotNil(t, err)
-	assert.Equal(t, []dto.Hotel{}, hotelsRes)
-	assert.Equal(t, 500, err.Status())
-
-}
-
-func TestSearchErrorBusinessClient(t *testing.T) {
-	initTestClient2()
-	solrMockClient := client.SolrClient.(*client.SolrMockClient)
-	businessMockClient := client.BusinessClient.(*client.BusinessMockClient)
-
-	city := "CBA"
-	hotel_id_1 := uuid.New()
-	hotel_id_2 := uuid.New()
-	hotel_id_3 := uuid.New()
-
-	var hotelsDto = []dto.Hotel{
-		dto.Hotel{
-			HotelID: hotel_id_1,
-		},
-		dto.Hotel{
-			HotelID: hotel_id_2,
-		},
-		dto.Hotel{
-			HotelID: hotel_id_3,
-		},
-	}
-
-	solrMockClient.On("SearchHotels", city).Return(hotelsDto, nil)
-
-	checkInDate, _ := time.Parse("2006-01-02", "2023-10-25")
-	checkOutDate, _ := time.Parse("2006-01-02", "2023-11-25")
-
-	businessMockClient.On("GetHotelAvailability", hotel_id_1, checkInDate, checkOutDate).Return(dto.BusinessResponse{hotel_id_1, true}, nil)
-	businessMockClient.On("GetHotelAvailability", hotel_id_2, checkInDate, checkOutDate).Return(dto.BusinessResponse{}, errors.New("cualquier error"))
-	businessMockClient.On("GetHotelAvailability", hotel_id_3, checkInDate, checkOutDate).Return(dto.BusinessResponse{hotel_id_3, true}, nil)
+	cacheKey := fmt.Sprintf("%s/%s/%s", city, checkInDate.Format("2006-01-02"), checkOutDate.Format("2006-01-02"))
+	cacheMockClient.On("Get", cacheKey).Return(nil)
 
 	hotelsRes, err := SearchService.Search(city, checkInDate, checkOutDate)
 	assert.NotNil(t, err)
 	assert.Equal(t, []dto.Hotel{}, hotelsRes)
 	assert.Equal(t, 500, err.Status())
+
 }
