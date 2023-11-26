@@ -2,10 +2,12 @@ import { associateAmenities, createHotel, getAmenities, insertPhoto } from "@/li
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import HotelDetail from "./HotelDetail";
+import { useRouter } from "next/router";
 
 export default function CreateHotel() {
 
   // Create hotel
+  const router = useRouter()
   const [hotel, setHotel] = useState(null)
   const [formData, setFormData] = useState({
     amadeus_id: '',
@@ -30,7 +32,8 @@ export default function CreateHotel() {
   const onSubmit = async e => {
     e.preventDefault();
     const newHotel = await createHotel(amadeus_id, title, city_code, description, price, amenities)
-    setHotel(newHotel)
+    const url = `/admin/hotels/${newHotel.hotel_id}`
+    router.push(url)
   }
   useEffect(() => {
     // Este efecto secundario se ejecutará cuando el valor de 'hotel' cambie

@@ -47,42 +47,45 @@ export async function createHotel(amadeus_id, title,city_code, description, pric
 
 }
 
-export async function updateHotel(hotelID, title, description, price_per_day, rooms, active) {
-    rooms = parseInt(rooms);
+export async function updateHotel(hotel_id, amadeus_id, title, description, price_per_day, city_code, active, photos, amenities, message) {
     price_per_day = parseFloat(price_per_day);
-  
+
     const config = {
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      withCredentials: true
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        withCredentials: true
     };
-  
+
     const body = JSON.stringify({
-      title,
-      description,
-      price_per_day,
-      rooms,
-      active
+        hotel_id,
+        amadeus_id,
+        title,
+        description,
+        price_per_day,
+        city_code,
+        active,
+        photos,
+        amenities
     });
-  
+
     try {
-      const res = await axios.put(`/api/hotel/update/${hotelID}`, body, config);
-      if (res.status === 200) {
-        alert('success', 'Hotel Updated');
-        return res.data.hotel;
-      } else {
-        //console.log("res: " + res);
-        alert('error', res.data.error.toString());
-        return null;
-      } 
+        const res = await axios.put(`/api/hotel/update/${hotel_id}`, body, config);
+        if (res.status === 200) {
+            alert('success', message);
+            return res.data.hotel;
+        } else {
+            //console.log("res: " + res);
+            alert('error', res.data.error.toString());
+            return null;
+        }
     } catch (error) {
         const errorMessage = error.response?.data?.error ?? 'Unknown error occurred';
         //console.log(error);
         alert('error', String(errorMessage));
         return null;
-      }
     }
+}
 
 export async function insertPhoto(hotelID, file) {
 

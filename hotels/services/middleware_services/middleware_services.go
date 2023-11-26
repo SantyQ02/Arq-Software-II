@@ -71,7 +71,7 @@ func (m *middlewareService) CheckAdmin() gin.HandlerFunc {
 		client := &http.Client{}
 		res, err := client.Do(r)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to make request!"})
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Failed to make request!"})
 		}
 
 		// defer res.Body.Close()
@@ -84,7 +84,7 @@ func (m *middlewareService) CheckAdmin() gin.HandlerFunc {
 		// }
 
 		if res.StatusCode != http.StatusOK {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal api error!"})
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "You aren't admin!"})
 			return
 		}else {
 			ctx.Next()

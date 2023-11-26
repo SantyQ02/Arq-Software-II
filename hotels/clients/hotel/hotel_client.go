@@ -18,6 +18,7 @@ import (
 type hotelClient struct{}
 
 type hotelClientInterface interface {
+	GetHotels() model.Hotels
 	GetHotelById(id string) model.Hotel
 	InsertHotel(hotel model.Hotel) model.Hotel
 	UpdateHotel(hotel model.Hotel) model.Hotel
@@ -40,7 +41,24 @@ type Bodystruct struct {
 	AmadeusID  string `json:"amadeus_id,omitempty"`
 }
 
+func (c *hotelClient) GetHotels() model.Hotels {
+	var hotels model.Hotels
 
+	cur, err := Db.Collection("hotels").Find(context.TODO(), bson.D{})
+	if err != nil {
+		log.Error("")
+		return model.Hotels{}
+	}
+	
+	er := cur.All(context.TODO(), &hotels)
+
+	if er != nil {
+		log.Error("")
+		return model.Hotels{}
+	}
+
+	return hotels
+}
 
 func (c *hotelClient) GetHotelById(id string) model.Hotel {
 	var hotel model.Hotel
@@ -67,6 +85,11 @@ func (c *hotelClient) InsertHotel(hotel model.Hotel) model.Hotel {
 }
 
 func (c *hotelClient) UpdateHotel(hotel model.Hotel) model.Hotel {
+	if hotel.HotelID == ""{
+		log.Error("")
+		return model.Hotel{}
+	}
+
 	_, err := Db.Collection("hotels").UpdateOne(context.TODO(), bson.D{{"HotelID", hotel.HotelID}},bson.D{{"$set",&hotel}})
 
 	if err != nil {
@@ -85,7 +108,6 @@ func (c *hotelClient) DeleteHotel(id string) error {
 	}
 	return nil
 }
-
 
 func (c *hotelClient) HotelMapping(hotel model.Hotel) error {
 
