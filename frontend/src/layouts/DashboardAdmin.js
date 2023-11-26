@@ -17,7 +17,6 @@ const navigation = [
   { name: 'Hotels', href: '/admin/hotels', current: false },
   { name: 'New hotel', href: '/admin/hotels/create', current: false },
   { name: 'Bookings', href: '/admin/bookings', current: false },
-  { name: 'Amenities', href: '/admin/amenities', current: false },
 ]
 const userNavigation = [
   { name: 'Sign out', href: '#' },
