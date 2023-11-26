@@ -12,7 +12,7 @@ import (
 
 
 func init() {
-	initializers.LoadTestEnv("../.env")
+	initializers.LoadTestEnv("../.env.test")
 	solrDB.StartTestSolr()
 	SolrClient = &solrClient{}
 

@@ -1,3 +1,4 @@
 mvc-go
 /mvc-go
 /sender
+!.env
