@@ -18,13 +18,13 @@ export default function HotelsList() {
 
     const handleCancelHotel = async (e, hotel) => {
         e.preventDefault()
-        await updateHotel(hotel.hotel_id, hotel.title, hotel.description, hotel.price_per_day, hotel.rooms, false)
+        await updateHotel(hotel.hotel_id, hotel.amadeus_id, hotel.title, hotel.description, hotel.price_per_day, hotel.city_code, false, hotel.photos, hotel.amenities, 'Hotel deactivated!')
         get_hotels()
     }
 
     const handleRegisterHotel = async (e, hotel) => {
         e.preventDefault()
-        await updateHotel(hotel.hotel_id, hotel.title, hotel.description, hotel.price_per_day, hotel.rooms, true)
+        await updateHotel(hotel.hotel_id, hotel.amadeus_id, hotel.title, hotel.description, hotel.price_per_day, hotel.city_code, true, hotel.photos, hotel.amenities, 'Hotel activated!')
         get_hotels()
     }
 

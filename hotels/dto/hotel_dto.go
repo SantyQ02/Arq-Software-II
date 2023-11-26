@@ -11,7 +11,7 @@ type Hotel struct {
 	PricePerDay float64   `json:"price_per_day" binding:"required"`
 	Photos      Photos    `json:"photos"`
 	Amenities   Amenities `json:"amenities"`
-	Active      bool      `json:"active,omitempty"`
+	Active      bool      `json:"active"`
 }
 
 type Hotels []Hotel
