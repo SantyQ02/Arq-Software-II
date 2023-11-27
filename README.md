@@ -40,16 +40,15 @@ python3 test.py
 ## (run on several terminals to stress the frontend service even more.)
 ```
 
-# Test
+# Run Tests
 
-    docker-compose -f docker-compose-dev.yml up -d
-    cd containers
-    go get -d
-    go run main.go
+    cd business
+    go test ./...
+    cd ../hotels
+    go test ./...
+    cd ../search
+    go test ./...
 
-# Business Testing
-
-    docker-compose up db_business memcached business --build
 
 # Hotel Reservation Project with Microservices
 
