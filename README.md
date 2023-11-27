@@ -42,13 +42,17 @@ python3 test.py
 
 # Run Tests
 
-    cd business
-    go test ./...
-    cd ../hotels
-    go test ./...
-    cd ../search
-    go test ./...
+```bash
+cd business
+go test ./...
+cd ../hotels
+go test ./...
+cd ../search
+go test ./...
 
+## One line
+cd business && go test ./... && cd ../hotels && go test ./... && cd ../search && go test ./...
+```
 
 # Hotel Reservation Project with Microservices
 
